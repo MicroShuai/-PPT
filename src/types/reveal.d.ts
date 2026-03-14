@@ -21,6 +21,7 @@ declare module 'reveal.js' {
     constructor(root: HTMLElement, options?: RevealOptions);
     initialize(): Promise<void>;
     destroy(): void;
+    layout(): void;
     sync(): void;
   }
 }

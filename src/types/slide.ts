@@ -23,6 +23,7 @@ export interface PresentationDeck {
 export interface BaseSlideDefinition<T extends SlideType, P> {
   id: string;
   type: T;
+  variant?: string;
   eyebrow?: string;
   title: string;
   subtitle?: string;
@@ -88,6 +89,12 @@ export interface ConceptSlidePayload {
   quote?: string;
 }
 
+export interface CaseStudyExamplePair {
+  title: string;
+  before: string;
+  after: string;
+}
+
 export interface CaseStudySlidePayload {
   scenarioLabel?: string;
   challengeLabel?: string;
@@ -98,6 +105,7 @@ export interface CaseStudySlidePayload {
   challenge: string[];
   beforePrompt: string;
   afterPrompt: string;
+  examplePairs?: CaseStudyExamplePair[];
   outcomes: MetricItem[];
   learnings: string[];
 }

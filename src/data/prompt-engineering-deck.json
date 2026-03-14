@@ -322,7 +322,19 @@
         "beforeLabel": "错误示范",
         "beforePrompt": "请帮我看一下这段 Python 脚本，你能给我挑挑毛病吗？",
         "afterLabel": "专业指令",
-        "afterPrompt": "审查以下 Python 代码片段。找出其中存在并发性能风险的 3 个位置，并以 Markdown 表格形式输出优化建议。",
+        "afterPrompt": "审查以下 Python 代码片段。\n找出其中存在并发性能风险的 3 个位置。\n按 Markdown 表格输出：风险位置 / 触发原因 / 优化建议。",
+        "examplePairs": [
+          {
+            "title": "SQL 性能审查",
+            "before": "帮我看看这条 SQL 有没有问题？",
+            "after": "审查以下 SQL。判断是否存在索引失效、全表扫描或排序性能风险，并按“风险点 / 原因 / 优化建议”输出。"
+          },
+          {
+            "title": "需求拆解",
+            "before": "帮我做个批量报工功能方案。",
+            "after": "基于 MES 场景，拆解“批量报工”功能，输出角色、主流程、异常场景、接口清单和验收标准。"
+          }
+        ],
         "outcomes": [
           {
             "label": "上下文噪音",

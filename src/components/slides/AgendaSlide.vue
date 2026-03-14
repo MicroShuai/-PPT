@@ -9,58 +9,72 @@ defineProps<{
 
 <template>
   <SlideShell :slide="slide">
-    <div class="grid h-full w-full grid-cols-[1.3fr_0.8fr] gap-8">
-      <div class="grid gap-3">
-        <article
-          v-for="(item, index) in slide.payload.items"
-          :key="item.title"
-          class="slide-panel fragment flex items-start gap-4 p-4"
-        >
-          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-blue-200 bg-blue-50/90 text-xl font-semibold text-blue-700">
-            {{ String(index + 1).padStart(2, '0') }}
-          </div>
-          <div class="space-y-2">
-            <div class="flex items-center gap-3">
-              <h3 class="text-[22px] font-semibold text-slate-900">
-                {{ item.title }}
-              </h3>
-              <span class="rounded-full border border-slate-200 bg-white/50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                {{ item.tag }}
-              </span>
+    <div class="grid h-full min-h-0 w-full grid-cols-[1.08fr_0.92fr] gap-6">
+      <div class="relative pl-7">
+        <div class="absolute bottom-5 left-[1.55rem] top-6 w-px bg-gradient-to-b from-blue-300 via-blue-200/50 to-transparent" />
+
+        <div class="grid gap-3">
+          <article
+            v-for="(item, index) in slide.payload.items"
+            :key="item.title"
+            class="slide-rail-card fragment pl-16 pr-5 py-4"
+          >
+            <div class="absolute left-0 top-4 flex h-11 w-11 items-center justify-center rounded-[16px] border border-blue-200 bg-white/90 text-base font-semibold text-blue-700 shadow-sm">
+              {{ String(index + 1).padStart(2, '0') }}
             </div>
-            <p class="text-base leading-7 text-slate-700">
-              {{ item.description }}
-            </p>
-          </div>
-        </article>
+
+            <div class="space-y-2">
+              <div class="flex items-center gap-3">
+                <h3 class="text-[22px] font-semibold text-slate-900">
+                  {{ item.title }}
+                </h3>
+                <span class="slide-ribbon !px-3 !py-1 !tracking-[0.14em]">
+                  {{ item.tag }}
+                </span>
+              </div>
+              <p class="text-[15px] leading-6 text-slate-700">
+                {{ item.description }}
+              </p>
+            </div>
+          </article>
+        </div>
       </div>
 
-      <aside class="slide-panel flex h-full flex-col justify-between p-5">
-        <div>
-          <p class="slide-label mb-4 text-blue-700/80">
-            Focus
+      <aside class="grid min-h-0 grid-rows-[auto_1fr_auto] gap-4">
+        <div class="slide-stage px-6 py-5">
+          <p class="slide-label mb-3 text-blue-700/80">
+            Roadmap Intent
           </p>
-          <h3 class="text-[26px] font-semibold text-slate-900">
+          <h3 class="text-[28px] font-semibold leading-tight text-slate-900">
             {{ slide.payload.aside.title }}
           </h3>
         </div>
 
-        <div class="space-y-3">
+        <div class="grid gap-3">
           <div
-            v-for="point in slide.payload.aside.points"
+            v-for="(point, index) in slide.payload.aside.points"
             :key="point"
-            class="slide-panel-soft fragment px-4 py-3.5"
+            class="slide-frost fragment px-4 py-3.5"
           >
-            <p class="text-base leading-7 text-slate-700">
-              {{ point }}
-            </p>
+            <div class="flex items-start gap-4">
+              <span class="slide-number-chip !h-10 !w-10 !rounded-2xl !text-base">
+                {{ index + 1 }}
+              </span>
+              <p class="pt-1 text-[15px] leading-6 text-slate-700">
+                {{ point }}
+              </p>
+            </div>
           </div>
         </div>
 
-        <div class="rounded-[20px] border border-amber-200 bg-amber-50/90 px-5 py-4">
-          <p class="text-sm font-medium leading-6 text-amber-800">
-            目标不是把 AI 讲成万能工具，而是把它落成一套团队可以复用的方法论。
-          </p>
+        <div class="flex flex-wrap gap-2.5">
+          <span
+            v-for="item in slide.payload.items"
+            :key="`${item.title}-${item.tag}`"
+            class="slide-ribbon !px-3 !py-1 !text-[11px]"
+          >
+            {{ item.tag }}
+          </span>
         </div>
       </aside>
     </div>
