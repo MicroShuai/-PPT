@@ -1,0 +1,1146 @@
+{
+  "meta": {
+    "title": "提示词工程与 AI 提效分享",
+    "topic": "Prompt Engineering for Team Efficiency",
+    "theme": "corporate-tech",
+    "ratio": "16:9",
+    "backgroundImage": "/images/presentation-bg.png"
+  },
+  "slides": [
+    {
+      "id": "cover-overview",
+      "type": "cover",
+      "eyebrow": "内部技术分享",
+      "title": "提示词工程与 AI 提效分享",
+      "subtitle": "抛开 tools 清单，回到一个更根本的问题：AI 能否真正进入团队协作与研发链路。",
+      "payload": {
+        "speaker": "前端化 PPT 演示系统 Demo",
+        "headline": "AI 的价值，不在于有没有工具，而在于团队能否把模糊问题表达成可执行任务。",
+        "highlights": [
+          "项目沟通协作",
+          "需求传递质量",
+          "研发提效与交付稳定性"
+        ],
+        "metrics": [
+          {
+            "label": "覆盖章节",
+            "value": "10 大板块"
+          },
+          {
+            "label": "方法技术",
+            "value": "15 类 Prompt 技术"
+          },
+          {
+            "label": "最终目标",
+            "value": "团队级方法论"
+          }
+        ],
+        "footer": "Prompt Engineering makes AI operational, not ornamental."
+      }
+    },
+    {
+      "id": "positioning-scenarios",
+      "type": "three-column",
+      "eyebrow": "核心开篇与定位",
+      "title": "这不是单一角色技巧，而是一套覆盖团队协作的表达方法",
+      "subtitle": "分享重点不是某个 AI 工具，而是如何把问题讲清楚，让 AI 稳定产出对团队有价值的结果。",
+      "payload": {
+        "intro": "抛开 skills、MCP、CLI、Agent 这些名词，先回答一个问题：AI 可以帮助团队在哪些真实场景里降低成本？",
+        "columns": [
+          {
+            "title": "PM 与开发协作",
+            "caption": "沟通与澄清",
+            "points": [
+              "把散落在聊天里的背景、目标和边界整理成同一份任务描述",
+              "减少反复确认和口头补充带来的误解",
+              "让需求讨论更像工程评审而不是二次猜题"
+            ]
+          },
+          {
+            "title": "需求传递质量",
+            "caption": "结构化表达",
+            "points": [
+              "不只说想做什么，还要讲为什么做、怎么验收",
+              "补齐流程、异常、边界条件和输出格式",
+              "让需求从想法变成开发可执行输入"
+            ]
+          },
+          {
+            "title": "研发执行效率",
+            "caption": "拆解与交付",
+            "points": [
+              "辅助做任务拆解、代码草稿、测试点和文档整理",
+              "减少重复性样板劳动与遗漏",
+              "把个人经验沉淀成可复用模板"
+            ]
+          }
+        ],
+        "takeaway": "方法论定位：AI 提效的关键，不只是有没有工具，而是能不能把问题表达清楚。"
+      }
+    },
+    {
+      "id": "why-this-topic",
+      "type": "concept",
+      "eyebrow": "为什么要讲这个",
+      "title": "同样都在用 AI，效果差异巨大的根因，其实是任务表达能力",
+      "subtitle": "真正值得讲的，不是工具清单，而是如何把模糊问题变成 AI 可执行的问题。",
+      "payload": {
+        "lead": "企业都希望通过 AI 提升效率，但在真实团队里，经常出现“有人觉得很强，有人觉得一般”的明显分化。",
+        "blocks": [
+          {
+            "label": "表面现象",
+            "value": "效果差异大",
+            "description": "同一个模型、同一类任务，不同人得到的结果稳定性完全不同。"
+          },
+          {
+            "label": "核心原因",
+            "value": "表达能力差异",
+            "description": "需求说不清、上下文交代不全、边界不明确，模型只能被迫猜测。"
+          },
+          {
+            "label": "真正议题",
+            "value": "Prompt Engineering",
+            "description": "重点不是再列工具，而是训练团队把问题表达成工程任务。"
+          }
+        ],
+        "emphasis": {
+          "title": "分享主线",
+          "body": "通过提示词工程，把模糊问题变成结构化问题，让 AI 真正成为项目协作和研发提效工具。"
+        },
+        "quote": "需求说不清，AI 就整理不清；场景交代不全，AI 就容易理解偏差。"
+      }
+    },
+    {
+      "id": "agenda-map",
+      "type": "agenda",
+      "eyebrow": "目录",
+      "title": "完整讲稿会按六个层次展开",
+      "subtitle": "先建立共同认知，再进入技术方法、应用场景和安全护栏，保证内容可以落地复用。",
+      "payload": {
+        "items": [
+          {
+            "title": "开篇定位",
+            "description": "明确这场分享面向谁、解决什么问题，以及为什么值得讲。",
+            "tag": "Intro"
+          },
+          {
+            "title": "团队痛点与 AI 能力边界",
+            "description": "搞清楚协作低效源头，以及 AI 真正擅长的任务类型。",
+            "tag": "Pain"
+          },
+          {
+            "title": "提示词工程的价值与核心心法",
+            "description": "把“结构化表达”与“精确指令”建立成统一思维方式。",
+            "tag": "Mindset"
+          },
+          {
+            "title": "15 类 Prompt 技术核心",
+            "description": "从 Zero-shot 到 Reflexion，覆盖研发场景里最实用的方法集合。",
+            "tag": "Tech"
+          },
+          {
+            "title": "研发体系落地应用场景",
+            "description": "看个人提效和团队提效两类最直接的落地方式。",
+            "tag": "Apply"
+          },
+          {
+            "title": "大模型安全护栏",
+            "description": "从威胁建模到纵深防御，避免把风险直接接进生产链路。",
+            "tag": "Security"
+          }
+        ],
+        "aside": {
+          "title": "本次分享的目标",
+          "points": [
+            "建立结构化表达意识",
+            "覆盖所有核心知识点而不是只讲概念",
+            "沉淀一套团队可复用的提示词方法论"
+          ]
+        }
+      }
+    },
+    {
+      "id": "pain-points",
+      "type": "three-column",
+      "eyebrow": "研发协作痛点",
+      "title": "当前团队里最常见的三类低效，几乎都和信息表达有关",
+      "subtitle": "这些问题未必能被 AI 完全消灭，但可以通过结构化输入显著降低沟通成本和返工率。",
+      "payload": {
+        "intro": "痛点的根源不是缺少人，而是背景、目标、流程和边界经常无法一次性交代清楚。",
+        "columns": [
+          {
+            "title": "沟通成本高",
+            "caption": "PM 与开发反复确认",
+            "points": [
+              "需求大量依赖口头描述，关键信息散落在群聊和会议中",
+              "背景、边界、优先级说不全，开发只能靠经验补齐理解",
+              "一轮轮确认推高返工和推进成本"
+            ]
+          },
+          {
+            "title": "需求不清晰",
+            "caption": "缺少可执行定义",
+            "points": [
+              "只讲想做什么，没有讲为什么做",
+              "缺少原型、流程、异常场景和验收标准",
+              "开发理解偏差，测试点和上线预期容易错位"
+            ]
+          },
+          {
+            "title": "研发效率不稳定",
+            "caption": "重复劳动与遗漏并存",
+            "points": [
+              "任务拆解、样板代码、文档和测试重复投入",
+              "边界判断、异常处理和联调注意点容易遗漏",
+              "第三方对接、补文档、排查问题拉长整体周期"
+            ]
+          }
+        ],
+        "takeaway": "金句：AI 不能真正替代沟通，但可以显著降低沟通问题造成的返工与损耗。"
+      }
+    },
+    {
+      "id": "ai-strengths",
+      "type": "concept",
+      "eyebrow": "AI 真正擅长什么",
+      "title": "AI 最适合优先解决的，是高频、重复、结构化、可描述的任务",
+      "subtitle": "它不是替代人做最终判断，而是帮助人更快完成整理、分析、生成和风险暴露。",
+      "payload": {
+        "lead": "项目协作和研发过程中，恰好存在大量结构化环节，这正是 AI 可以率先发挥价值的地方。",
+        "blocks": [
+          {
+            "label": "信息整理",
+            "value": "高频",
+            "description": "会议纪要、需求梳理、接口说明和上下文归纳都适合先交给 AI 做初稿。"
+          },
+          {
+            "label": "结构化表达",
+            "value": "稳定",
+            "description": "文档模板、验收清单、任务拆解与方案对比可以快速形成统一结构。"
+          },
+          {
+            "label": "文档与代码草稿",
+            "value": "高效",
+            "description": "样板代码、原型页、测试数据、接口说明和注释能够节省大量重复时间。"
+          },
+          {
+            "label": "风险提示与自动化",
+            "value": "补位",
+            "description": "边界条件、异常场景、重复业务功能封装与自动化流程更容易被提前暴露。"
+          }
+        ],
+        "emphasis": {
+          "title": "团队判断标准",
+          "body": "先让 AI 进入可描述、可验证、可复用的任务，再逐步扩展到复杂决策场景。"
+        }
+      }
+    },
+    {
+      "id": "input-quality",
+      "type": "concept",
+      "eyebrow": "为什么很多人觉得 AI 一般",
+      "title": "多数失望并不是模型完全没能力，而是输入方式不够专业",
+      "subtitle": "只要任务缺少关键条件，模型就只能在不完整信息里做概率猜测。",
+      "payload": {
+        "lead": "典型失败模式通常不是“模型太弱”，而是输入里缺少了 AI 完成任务所必需的字段。",
+        "blocks": [
+          {
+            "label": "问题定义",
+            "value": "太模糊",
+            "description": "没有说清对象、目标和场景，模型很难知道你真正想解决什么。"
+          },
+          {
+            "label": "上下文",
+            "value": "不完整",
+            "description": "背景信息、已有系统约束和业务前提缺失时，输出会明显跑偏。"
+          },
+          {
+            "label": "输出规范",
+            "value": "不明确",
+            "description": "没有指定格式和结构，结果难以直接进入后续流程。"
+          },
+          {
+            "label": "任务规模",
+            "value": "一次过大",
+            "description": "一次要求 AI 完成过于复杂的任务，往往会导致遗漏和不稳定。"
+          }
+        ],
+        "emphasis": {
+          "title": "核心结论",
+          "body": "输入不专业，输出就不会稳定。提示词工程的价值，是把模糊问题改写成 AI 可以执行的问题。"
+        },
+        "quote": "没有边界条件，没有验收标准，没有输出格式，结果自然无法稳定。"
+      }
+    },
+    {
+      "id": "prompt-value",
+      "type": "concept",
+      "eyebrow": "提示词工程的核心价值",
+      "title": "Prompt Engineering 的价值，不是写花哨的话，而是提升可执行性与可控性",
+      "subtitle": "它同时服务于“人和 AI”的协作，也反过来提升“人和人”的沟通质量。",
+      "payload": {
+        "lead": "当团队学会结构化表达之后，Prompt 就不再只是对模型说话，而是在建立统一的任务描述标准。",
+        "blocks": [
+          {
+            "label": "价值 1",
+            "value": "模糊问题结构化",
+            "description": "把一句“帮我做个批量报工功能”拆成角色、流程、异常、接口和验收标准。"
+          },
+          {
+            "label": "价值 2",
+            "value": "输出更稳定",
+            "description": "补齐角色、任务、背景、约束与格式后，AI 的理解角度会更收敛。"
+          },
+          {
+            "label": "价值 3",
+            "value": "协作效率提升",
+            "description": "PM 给开发的需求更清晰，开发做任务拆解更完整，团队传递信息更高效。"
+          }
+        ],
+        "emphasis": {
+          "title": "关键认识",
+          "body": "提示词工程不是技巧集合，而是一套帮助团队稳定表达、稳定协作、稳定交付的方法。"
+        },
+        "quote": "结构化表达一旦形成模板，就会同时提升人与 AI、人与人两条协作链路。"
+      }
+    },
+    {
+      "id": "absolute-mode",
+      "type": "case-study",
+      "eyebrow": "核心心法",
+      "title": "摒弃拟人化沟通，进入 Absolute Mode",
+      "subtitle": "和 AI 沟通，不需要礼貌，只需要精确。技术文档式表达更接近工程级产出。",
+      "payload": {
+        "scenarioLabel": "Mindset",
+        "scenario": "Absolute Mode / 精确指令思维",
+        "challengeLabel": "为什么口语化提示有害",
+        "challenge": [
+          "寒暄和软性请求会向上下文注入无意义噪音，浪费 token 并分散注意力",
+          "“给我一个方案”这类开放式索取缺乏工程边界，模型只能盲猜风格和范围",
+          "去人格化、直切主题的任务描述，更接近系统蓝图约束"
+        ],
+        "beforeLabel": "错误示范",
+        "beforePrompt": "请帮我看一下这段 Python 脚本，你能给我挑挑毛病吗？",
+        "afterLabel": "专业指令",
+        "afterPrompt": "审查以下 Python 代码片段。找出其中存在并发性能风险的 3 个位置，并以 Markdown 表格形式输出优化建议。",
+        "outcomes": [
+          {
+            "label": "上下文噪音",
+            "value": "显著下降"
+          },
+          {
+            "label": "工程边界",
+            "value": "明确"
+          },
+          {
+            "label": "结果可复用性",
+            "value": "更强"
+          }
+        ],
+        "learningsLabel": "分享金句",
+        "learnings": [
+          "AI 不是读心者，而是概率推理引擎。",
+          "动作动词越精确，输出越容易进入工程流程。",
+          "和 AI 沟通，不需要礼貌，只需要精确。"
+        ]
+      }
+    },
+    {
+      "id": "prompt-engineering-meaning",
+      "type": "concept",
+      "eyebrow": "技术核心总览",
+      "title": "提示词工程的含义：让大语言模型在具体场景里稳定工作",
+      "subtitle": "它关注提示词的开发和优化，帮助我们更好理解模型的能力边界，并把模型接进真实业务流程。",
+      "payload": {
+        "lead": "Prompt Engineering 是一门偏实践的工程学科，目标不是解释模型，而是提高模型在任务中的有效性和可控性。",
+        "blocks": [
+          {
+            "label": "学科定位",
+            "value": "开发与优化 Prompt",
+            "description": "围绕任务目标设计输入结构，让模型更容易产出可用结果。"
+          },
+          {
+            "label": "作用对象",
+            "value": "LLM 在各场景中的应用",
+            "description": "从文档整理到代码草稿，再到工具调用和多阶段决策。"
+          },
+          {
+            "label": "真正价值",
+            "value": "理解能力与局限",
+            "description": "知道模型什么时候适合直接问，什么时候必须给上下文、给示例、给工具。"
+          },
+          {
+            "label": "工程目标",
+            "value": "稳定、可审查、可复用",
+            "description": "让 Prompt 变成团队资产，而不是一次性的个人经验。"
+          }
+        ],
+        "emphasis": {
+          "title": "过渡说明",
+          "body": "后面的技术核心部分，会从最基础的 Zero-shot 一直讲到 ReAct 和 Reflexion。"
+        }
+      }
+    },
+    {
+      "id": "zero-shot",
+      "type": "case-study",
+      "eyebrow": "技术核心 01",
+      "title": "零样本提示：不提供示例，只告诉 AI 要做什么",
+      "subtitle": "当任务足够直接时，Zero-shot 可以用最低的指令成本快速拿到结论。",
+      "payload": {
+        "scenarioLabel": "Technique",
+        "scenario": "Zero-shot Prompting",
+        "challengeLabel": "核心逻辑",
+        "challenge": [
+          "不提供任何示例，只描述任务目标",
+          "依赖模型已有指令理解能力直接作答",
+          "更适合判断、分类、抽取这类简单任务"
+        ],
+        "beforeLabel": "Prompt",
+        "beforePrompt": "判断 Java 代码是否存在空指针风险：\n\npublic String getUserName(User user) {\n    return user.getName().trim();\n}",
+        "afterLabel": "AI 输出",
+        "afterPrompt": "存在空指针风险。",
+        "outcomes": [
+          {
+            "label": "示例数量",
+            "value": "0"
+          },
+          {
+            "label": "上手成本",
+            "value": "最低"
+          },
+          {
+            "label": "适合任务",
+            "value": "简单判断"
+          }
+        ],
+        "learningsLabel": "实战认识",
+        "learnings": [
+          "Zero-shot 适合起步快、规则简单的任务。",
+          "一旦任务复杂度提升，就需要示例或推理结构辅助。",
+          "它是所有高级方法的起点。"
+        ]
+      }
+    },
+    {
+      "id": "few-shot",
+      "type": "case-study",
+      "eyebrow": "技术核心 02",
+      "title": "少样本提示：先给 AI 看几个标准答案，再让它照着做",
+      "subtitle": "Few-shot 的核心不是解释原理，而是通过少量样例建立期望输出模式。",
+      "payload": {
+        "scenarioLabel": "Technique",
+        "scenario": "Few-shot Prompting",
+        "challengeLabel": "操作准则",
+        "challenge": [
+          "当 Zero-shot 对复杂任务不稳定时，用少量示例引导模型",
+          "示例的价值在于给出模式，而不是给出长篇解释",
+          "研发场景里尤其适合规则判断、文本归类、格式映射"
+        ],
+        "beforeLabel": "Prompt",
+        "beforePrompt": "判断下面 SQL 是否存在性能风险。\n\nSQL： SELECT * FROM user WHERE id = 1;\n结果： 低风险\n\nSQL： SELECT * FROM mes_operation WHERE FIND_IN_SET('OP001', operation_no);\n结果： 高风险\n\n任务下达： SELECT * FROM order_info WHERE create_time >= '2026-01-01';\n输出结果：",
+        "afterLabel": "AI 输出",
+        "afterPrompt": "低风险",
+        "outcomes": [
+          {
+            "label": "示例数量",
+            "value": "2"
+          },
+          {
+            "label": "价值核心",
+            "value": "模式对齐"
+          },
+          {
+            "label": "分享金句",
+            "value": "先给标准答案"
+          }
+        ],
+        "learningsLabel": "实战认识",
+        "learnings": [
+          "Few-shot 能显著提升复杂任务的一致性。",
+          "好示例比长解释更有价值。",
+          "少样本提示的核心不是“解释原理”，而是“先给 AI 看几个标准答案”。"
+        ]
+      }
+    },
+    {
+      "id": "cot",
+      "type": "case-study",
+      "eyebrow": "技术核心 03",
+      "title": "链式思考提示：让 AI 把推理过程展开，再得出结论",
+      "subtitle": "Zero-shot CoT 常见做法，就是在问题后补一句“请一步一步分析”。",
+      "payload": {
+        "scenarioLabel": "Technique",
+        "scenario": "Chain-of-Thought Prompting",
+        "challengeLabel": "核心价值",
+        "challenge": [
+          "普通提示往往只能得到一个结论，无法看见 AI 的判断过程",
+          "加入 CoT 后，模型会显式展开中间推理，复杂任务稳定性提升",
+          "适合 SQL 风险、事务边界、方案判断等需要解释链路的任务"
+        ],
+        "beforeLabel": "普通提示",
+        "beforePrompt": "判断下面 SQL 是否存在性能风险。\n\nSELECT * FROM mes_operation WHERE FIND_IN_SET('OP1001', operation_no);\n\nAI 输出：有性能风险",
+        "afterLabel": "加入 CoT 后",
+        "afterPrompt": "判断下面 SQL 是否存在性能风险，请一步一步分析。\n\nSELECT * FROM mes_operation WHERE FIND_IN_SET('OP1001', operation_no);\n\nAI 输出：\n第1步：该 SQL 使用了 FIND_IN_SET 函数。\n第2步：这类函数通常无法有效利用普通索引。\n第3步：在数据量较大时，可能导致全表扫描。\n结论：该 SQL 存在性能风险。",
+        "outcomes": [
+          {
+            "label": "Zero-shot",
+            "value": "直接给结论"
+          },
+          {
+            "label": "Few-shot",
+            "value": "模仿示例"
+          },
+          {
+            "label": "CoT",
+            "value": "展开推理"
+          }
+        ],
+        "learningsLabel": "实战认识",
+        "learnings": [
+          "CoT 适合需要解释理由和过程的复杂任务。",
+          "它不仅给答案，还能暴露判断路径，便于审查。",
+          "研发里可以直接用于分析是否要加 @Transactional 这类决策。"
+        ]
+      }
+    },
+    {
+      "id": "meta-prompting",
+      "type": "case-study",
+      "eyebrow": "技术核心 04",
+      "title": "元提示：不是只让 AI 写代码，而是要求它按可交付结构输出",
+      "subtitle": "普通提示只是让 AI“做内容”；Meta Prompting 则要求它“按工程交付规范组织内容”。",
+      "payload": {
+        "scenarioLabel": "Technique",
+        "scenario": "Meta Prompting",
+        "challengeLabel": "定义与价值",
+        "challenge": [
+          "普通提示关注“写什么”，元提示关注“按什么结构交付”",
+          "它会显式规定目录结构、文件顺序、路径、import 和输出规则",
+          "更适合直接生成接近研发交付物的结果"
+        ],
+        "beforeLabel": "Prompt",
+        "beforePrompt": "你是一名 Java 后端开发工程师，请根据需求输出完整代码。要求：\n1. 先输出项目目录结构\n2. 再按文件逐个输出代码\n3. 每个文件都要标明文件路径\n4. 代码必须可直接复制使用\n5. 不要省略 import\n\n需求：实现一个 Spring Boot 的文件上传接口，支持单文件上传，返回文件访问 URL。",
+        "afterLabel": "理想输出片段",
+        "afterPrompt": "src/main/java/com/demo/file\n  controller/FileController.java\n  service/FileService.java\n  service/impl/FileServiceImpl.java\n  dto/FileUploadResponse.java",
+        "outcomes": [
+          {
+            "label": "输出组织性",
+            "value": "更强"
+          },
+          {
+            "label": "可复制性",
+            "value": "更高"
+          },
+          {
+            "label": "交付形态",
+            "value": "更接近工程产物"
+          }
+        ],
+        "learningsLabel": "实战认识",
+        "learnings": [
+          "元提示适合对输出结构有强要求的研发任务。",
+          "它能显著降低“内容有了，但没法直接用”的情况。",
+          "团队越强调规范化交付，元提示的价值越高。"
+        ]
+      }
+    },
+    {
+      "id": "self-consistency",
+      "type": "concept",
+      "eyebrow": "技术核心 05",
+      "title": "一致性自检：不是只想一次，而是从多条推理路径里选择最一致的答案",
+      "subtitle": "它通过多路径思考和结果收敛，提升复杂分析任务的可靠性。",
+      "payload": {
+        "lead": "Self-Consistency 的核心，不是让 AI 只给一个结论，而是让它沿着多条思路分别分析，再从多个候选结果中挑选最一致的答案。",
+        "blocks": [
+          {
+            "label": "推理方式",
+            "value": "多路径采样",
+            "description": "让模型从不同思路分别推理，而不是一次性给唯一解释。"
+          },
+          {
+            "label": "决策方式",
+            "value": "收敛最一致答案",
+            "description": "对比多个结论，选择彼此最接近、最能相互印证的结果。"
+          },
+          {
+            "label": "实战案例",
+            "value": "库存数据 Bug",
+            "description": "前端刷新、后端未联动入库、业务状态更新但库存未变，都需要并行比较。"
+          },
+          {
+            "label": "适用任务",
+            "value": "复杂排查与推理",
+            "description": "尤其适合算术、常识判断、Bug 定位和多因子分析。"
+          }
+        ],
+        "emphasis": {
+          "title": "核心判断",
+          "body": "一致性自检不是让 AI 更会说，而是让它少走错方向。多路径思考后再收敛，能显著提升复杂分析质量。"
+        },
+        "quote": "结论 2 和结论 3 本质一致，都指向：后端联动逻辑执行问题。"
+      }
+    },
+    {
+      "id": "generated-knowledge",
+      "type": "case-study",
+      "eyebrow": "技术核心 06",
+      "title": "生成知识提示：先补知识，再写代码",
+      "subtitle": "如果任务本身依赖领域知识，先让 AI 把知识补全，再进入实现阶段，结果会更稳。",
+      "payload": {
+        "scenarioLabel": "Technique",
+        "scenario": "Generated Knowledge Prompting",
+        "challengeLabel": "核心准则",
+        "challenge": [
+          "很多研发任务失败，不是不会写代码，而是对业务知识理解不完整",
+          "先生成关键知识，再基于这些知识生成实现，能降低拍脑袋代码",
+          "在 MES、供应链、财务等领域任务里尤其重要"
+        ],
+        "beforeLabel": "两步式 Prompt",
+        "beforePrompt": "你是一名 MES 领域高级 Java 开发工程师。请按两步完成任务：\n第 1 步：先生成“工单完工后成品入库”的关键知识，包括业务节点、系统拆分、库存触发点和一致性问题。\n第 2 步：基于这些知识，生成接口说明、Dto、Controller、Service、入库联动逻辑、事务控制和 SQL 简例。",
+        "afterLabel": "AI 输出摘录",
+        "afterPrompt": "知识补全：\n1. 完工、质检、入库不一定是同一步。\n2. 库存更新通常在满足入库条件的业务节点触发。\n3. 需要关注状态变更与库存联动的一致性。\n\n代码输出：\n- Controller\n- Service\n- 入库联动逻辑\n- 事务控制\n- SQL 表设计简例",
+        "outcomes": [
+          {
+            "label": "业务理解",
+            "value": "先补齐"
+          },
+          {
+            "label": "代码质量",
+            "value": "更稳"
+          },
+          {
+            "label": "适用领域",
+            "value": "强业务系统"
+          }
+        ],
+        "learningsLabel": "实战认识",
+        "learnings": [
+          "先补知识，再写代码，是领域型任务的高收益做法。",
+          "这类 Prompt 很适合对接复杂行业系统。",
+          "它本质上是在减少模型对隐性业务规则的误判。"
+        ]
+      }
+    },
+    {
+      "id": "prompt-chaining",
+      "type": "flow",
+      "eyebrow": "技术核心 07",
+      "title": "提示链：复杂任务不要一次写完，而要拆成可调试的阶段",
+      "subtitle": "前一步输出作为后一步输入，结果更稳定、更透明，也更适合复杂研发任务。",
+      "payload": {
+        "description": "Prompt Chaining 的重点不是写更长的 Prompt，而是把复杂任务拆成分析、设计、实现三段式流程。",
+        "mermaid": "flowchart LR\n    A[Step 1\\n分析业务规则] --> B[Step 2\\n设计接口与表结构]\n    B --> C[Step 3\\n生成代码]\n    C --> D[Step 4\\n补测试点与风险说明]",
+        "checkpoints": [
+          "Step 1 先输出关键业务动作、触发条件、异常场景和一致性要求。",
+          "Step 2 再根据上一步分析设计接口、Dto、Service 和表结构。",
+          "Step 3 最后基于前两步结果生成代码，而不是直接跳到实现。",
+          "分享建议：先分析、再设计、最后写，结果最稳定。"
+        ],
+        "takeaway": "提示链的价值，在于把复杂任务变成多个更容易校验和修正的小步骤。"
+      }
+    },
+    {
+      "id": "tree-of-thoughts",
+      "type": "case-study",
+      "eyebrow": "技术核心 08",
+      "title": "思维树提示：让 AI 在给答案前，先开一场架构评审会",
+      "subtitle": "Tree of Thoughts 是 CoT 的升级版，强调多方案发散、自评估、回溯与收敛。",
+      "payload": {
+        "scenarioLabel": "Technique",
+        "scenario": "Tree of Thoughts (ToT)",
+        "challengeLabel": "核心逻辑",
+        "challenge": [
+          "不要让 AI 一条道走到黑，而是先提出多个候选方案",
+          "再从开发成本、性能、可靠性等维度评估优劣",
+          "最后结合业务特点淘汰不合适的方案并收敛到最优设计"
+        ],
+        "beforeLabel": "ToT Prompt",
+        "beforePrompt": "你是一名资深 MES 架构师。请为“车间高并发物料拉动”设计后端处理逻辑：\n第 1 步提出至少 3 种实现方案；\n第 2 步从开发成本、高并发性能、数据防丢失三维严格评估；\n第 3 步输出最终推荐方案和关键交互流程。",
+        "afterLabel": "AI 决策摘录",
+        "afterPrompt": "方案 A：数据库直连。开发成本低，但并发写多时容易锁表，淘汰。\n方案 B：Redis List + 定时落库。性能好，但 Redis 宕机会丢数据，淘汰。\n方案 C：MQ + 数据库。开发成本中等，并发性能好，且消息可持久化。\n最终决策：选择方案 C，并输出 Spring Boot + MQ 的组件交互流程。",
+        "outcomes": [
+          {
+            "label": "候选方案",
+            "value": "至少 3 条"
+          },
+          {
+            "label": "评估维度",
+            "value": "成本 / 性能 / 可靠性"
+          },
+          {
+            "label": "最终目标",
+            "value": "全局更优"
+          }
+        ],
+        "learningsLabel": "分享金句",
+        "learnings": [
+          "思维树的核心不是“给一个答案”，而是“先发散、再收敛”。",
+          "它很适合复杂架构设计和上线决策。",
+          "对于研发设计，先让 AI 自己做一次架构评审，能显著降低挖坑概率。"
+        ]
+      }
+    },
+    {
+      "id": "rag",
+      "type": "case-study",
+      "eyebrow": "技术核心 09",
+      "title": "RAG：不要指望 AI 记住公司内部知识，要学会给它开卷考试",
+      "subtitle": "Retrieval-Augmented Generation 的本质，是先检索对的资料，再基于资料生成答案。",
+      "payload": {
+        "scenarioLabel": "Technique",
+        "scenario": "Retrieval-Augmented Generation",
+        "challengeLabel": "为什么必须做 RAG",
+        "challenge": [
+          "模型懂通用 Java，但它不懂你们公司内部 API 规范和私有字段",
+          "闭卷写代码时，AI 往往会凭空捏造参数和接口路径",
+          "把真实文档检索出来并连同问题一起给模型，才能逼近企业级定制答案"
+        ],
+        "beforeLabel": "闭卷提示",
+        "beforePrompt": "请帮我写一段 Java 代码，调用我们 MES 系统的工单下达接口，传入工单号和产品编码。",
+        "afterLabel": "RAG 开卷提示",
+        "afterPrompt": "你是一个后端开发。请根据下面提供的【内部 API 文档】，编写调用“工单下达接口”的 Java 代码。如果文档没有提到某些必填字段，请用注释标出。\n\n【内部 API 文档】\n接口路径：/api/v1/mes/workorder/create\n请求方式：POST\n参数：wo_no (String, 必填), prod_code (String, 必填), line_id (Integer, 可选)\n成功返回：{\"code\":200,\"msg\":\"success\",\"data\":\"wo_id\"}",
+        "outcomes": [
+          {
+            "label": "知识来源",
+            "value": "外部检索"
+          },
+          {
+            "label": "主要收益",
+            "value": "降低幻觉"
+          },
+          {
+            "label": "分享金句",
+            "value": "给 AI 开卷考试"
+          }
+        ],
+        "learningsLabel": "实战认识",
+        "learnings": [
+          "RAG 让 AI 的回答从通用科普变成企业级定制。",
+          "它解决的是“AI 不知道内部知识”和“AI 胡说八道”两个问题。",
+          "对内网系统、私有 API 和历史代码库场景尤其关键。"
+        ]
+      }
+    },
+    {
+      "id": "art",
+      "type": "flow",
+      "eyebrow": "技术核心 10",
+      "title": "ART：让 AI 从只会说话，进化到会查库、会计算、会继续推理",
+      "subtitle": "Automatic Reasoning and Tool-use 的重点，是让模型在遇到弱项时主动调用外部工具。",
+      "payload": {
+        "description": "当任务涉及实时数据或精确计算时，不能让 AI 凭空猜，应该规定工具集并允许它边推理边调用。",
+        "mermaid": "flowchart LR\n    A[任务: 排查 LOT-20260314 损耗率] --> B[Reason\\n先查数据库]\n    B --> C[Action\\nquery_database]\n    C --> D[Observation\\n1050 / 1000]\n    D --> E[Reason\\n需要精确计算]\n    E --> F[Action\\ncalculator]\n    F --> G[Observation\\n4.76%]\n    G --> H[Final Answer\\n损耗率超标]",
+        "checkpoints": [
+          "工具集示例：查询数据库、精确计算器、实时 API、工作流执行器。",
+          "后端程序要检查模型响应是否为 tool_call，再分发执行工具并把结果喂回模型。",
+          "不要让 AI 凭空猜实时数据，高级用法是让它自己决定什么时候该查、什么时候该算。",
+          "ART 的价值是把推理和工具能力接起来，而不是只让模型生成一段解释文字。"
+        ],
+        "takeaway": "不让 AI 猜数据，而是让 AI 学会在需要时暂停、取数、计算、再继续推理。"
+      }
+    },
+    {
+      "id": "ape",
+      "type": "case-study",
+      "eyebrow": "技术核心 11",
+      "title": "自动提示工程：写不好 Prompt 没关系，可以先让 AI 帮你写 Prompt",
+      "subtitle": "APE 把大模型当成提示词优化器，用任务目标和好坏案例反向生成更专业的模板。",
+      "payload": {
+        "scenarioLabel": "Technique",
+        "scenario": "Automatic Prompt Engineer",
+        "challengeLabel": "协作痛点",
+        "challenge": [
+          "很多人知道想要什么结果，但不知道怎样写出高质量提示词",
+          "粗糙 Prompt 往往导致结构松散、输出发散、无法直接进入研发流程",
+          "APE 的思路是用 AI 帮你生成、比较并筛选更好的提示词模板"
+        ],
+        "beforeLabel": "Bad Prompt",
+        "beforePrompt": "帮我给这个需求写一下测试点。",
+        "afterLabel": "APE Prompt",
+        "afterPrompt": "我是一个项目经理，我想让大模型根据“一句话需求”自动生成详尽的“研发提测验收标准”。\n请你扮演资深提示词工程师，帮我设计 3 个不同维度的优质提示词模板。\n要求：模板中必须包含[角色设定]、[背景]、[输出格式限制]以及[异常流考虑]。",
+        "outcomes": [
+          {
+            "label": "粗糙输入",
+            "value": "发散"
+          },
+          {
+            "label": "APE 结果",
+            "value": "模板化"
+          },
+          {
+            "label": "最终收益",
+            "value": "更易复用"
+          }
+        ],
+        "learningsLabel": "分享金句",
+        "learnings": [
+          "写不好提示词没关系，把终极目标告诉 AI，让它先教你怎么写。",
+          "APE 特别适合 PM、测试和交付文档场景。",
+          "打败魔法的最好方式，是用魔法生成更好的魔法。"
+        ]
+      }
+    },
+    {
+      "id": "active-prompt",
+      "type": "concept",
+      "eyebrow": "技术核心 12",
+      "title": "Active-Prompt：不是盲目给示例，而是把人工示例投给 AI 最容易出错的地方",
+      "subtitle": "人工投入不需要平均分配，而要优先用在高不确定、高分歧的难点样本上。",
+      "payload": {
+        "lead": "在 Few-shot 里，示例并不是越多越好。Active-Prompt 的思想是先让 AI 暴露不确定性，再让专家针对这些最难点补示例。",
+        "blocks": [
+          {
+            "label": "阶段 1",
+            "value": "暴露不确定性",
+            "description": "先让 AI 找出最难建模、分歧最大、最容易出错的业务对象。"
+          },
+          {
+            "label": "阶段 2",
+            "value": "人工定向标注",
+            "description": "由资深开发或业务专家只补最关键、最复杂的标准答案。"
+          },
+          {
+            "label": "阶段 3",
+            "value": "批量生成扩散",
+            "description": "再让 AI 按同样标准生成其他结构和内容，减少全面人工介入。"
+          }
+        ],
+        "emphasis": {
+          "title": "核心价值",
+          "body": "不是替 AI 把所有活都干了，而是让 AI 告诉你它哪里不会，人只负责教最难的那部分。"
+        },
+        "quote": "人工示例优先投给 AI 最容易出错的地方。"
+      }
+    },
+    {
+      "id": "directional-stimulus",
+      "type": "case-study",
+      "eyebrow": "技术核心 13",
+      "title": "方向性刺激提示：不给完整答案，只给关键方向词，让 AI 朝正确方向收敛",
+      "subtitle": "很多时候你不需要写长文，只要把关键约束词丢进去，就能显著改善结果质量。",
+      "payload": {
+        "scenarioLabel": "Technique",
+        "scenario": "Directional Stimulus Prompting",
+        "challengeLabel": "研发场景痛点",
+        "challenge": [
+          "PM 只描述业务流程时，AI 往往默认给出最普通的单机实现",
+          "如果缺少高并发、强一致性等架构线索，结果会停留在“能跑”的最低标准",
+          "方向性刺激的价值，是强制模型把关键约束融入实现"
+        ],
+        "beforeLabel": "普通提示",
+        "beforePrompt": "请帮我写一个车间工人扫码领料的后端逻辑。",
+        "afterLabel": "方向性刺激提示",
+        "afterPrompt": "请帮我写一个车间工人扫码领料的业务逻辑和核心代码。\n【方向性刺激（约束线索）】：强一致性、Redis 分布式锁、幂等性校验、防超卖机制。",
+        "outcomes": [
+          {
+            "label": "关键词数量",
+            "value": "4"
+          },
+          {
+            "label": "架构严谨度",
+            "value": "显著提升"
+          },
+          {
+            "label": "分享金句",
+            "value": "给对关键线索"
+          }
+        ],
+        "learningsLabel": "实战认识",
+        "learnings": [
+          "好的需求不一定是千字长文，而是给对关键技术词。",
+          "方向性刺激特别适合给出架构约束、性能约束和安全约束。",
+          "给 AI 正确的技术关键词，它就更容易还你一个严谨实现。"
+        ]
+      }
+    },
+    {
+      "id": "react",
+      "type": "flow",
+      "eyebrow": "技术核心 14",
+      "title": "ReAct：让 AI 遵循 Thought -> Action -> Observation 的循环",
+      "subtitle": "它是连接自然语言和系统操作的桥梁，也是 AI Agent 的重要基石。",
+      "payload": {
+        "description": "传统模型只会思考然后回答；ReAct 则要求模型一边思考，一边调用工具，一边根据观察结果继续推进。",
+        "mermaid": "flowchart LR\n    A[告警: 生产库死锁] --> B[Thought 1\\n先查锁等待状态]\n    B --> C[Action 1\\nDB_Monitor_API]\n    C --> D[Observation 1\\nwork_order 与 inventory 循环等待]\n    D --> E[Thought 2\\n查最近半小时慢 SQL]\n    E --> F[Action 2\\nLog_Search_API]\n    F --> G[Observation 2\\n加锁顺序相反]\n    G --> H[Final Answer\\n统一加锁顺序]",
+        "checkpoints": [
+          "任务示例：排查线上死锁，不是一次回答，而是逐步查状态、查日志、归因、给建议。",
+          "后端结构可拆成 Controller -> AgentService -> LLM Client -> Tool Dispatcher -> Database / API / Workflow。",
+          "ReAct 的本质，是让 AI 的“想”和“做”交替进行，而不是停留在纸面分析。",
+          "掌握它，就更容易理解未来的智能运维和自动化助手是怎么工作的。"
+        ],
+        "takeaway": "ReAct 是连接“自然语言”和“系统操作”的桥梁。"
+      }
+    },
+    {
+      "id": "reflexion",
+      "type": "case-study",
+      "eyebrow": "技术核心 15",
+      "title": "Reflexion：在输出终版前，强制 AI 先做一次自我 Code Review",
+      "subtitle": "不要拿 AI 的第一版草稿直接投产，把自我反思写进 Prompt，能拦截大量低级错误。",
+      "payload": {
+        "scenarioLabel": "Technique",
+        "scenario": "Reflexion",
+        "challengeLabel": "研发场景痛点",
+        "challenge": [
+          "AI 第一版代码或 SQL 往往能跑，但容易存在索引、性能和重复计算问题",
+          "Reflexion 要求模型在最终输出前先自查、找错、再修正",
+          "它尤其适合 SQL、方案设计、复杂代码生成和审查任务"
+        ],
+        "beforeLabel": "带反思要求的 Prompt",
+        "beforePrompt": "你是一个 DBA。请帮我写一段 SQL：查询某车间本月所有产生过不良品的工单及其物料消耗明细。\n\n【强制要求】\n1. 初稿生成\n2. 漏洞反思：审视是否存在全表扫描、多表 Join 性能问题或数据重复计算\n3. 优化修正\n4. 最终只输出优化后的终版 SQL",
+        "afterLabel": "AI 预期输出摘录",
+        "afterPrompt": "<反思>：初稿 SQL 虽然关联了工单和物料表，但缺少本月时间范围的索引条件，并且直接 JOIN 导致部分明细重复计算。\n\n<修正后>：补充时间过滤、调整关联方式，并输出优化后的终版 SQL。",
+        "outcomes": [
+          {
+            "label": "初稿风险",
+            "value": "可提前暴露"
+          },
+          {
+            "label": "低级 Bug",
+            "value": "显著减少"
+          },
+          {
+            "label": "分享金句",
+            "value": "先自审再输出"
+          }
+        ],
+        "learningsLabel": "实战认识",
+        "learnings": [
+          "Reflexion 适合给 AI 加一道强制自检工序。",
+          "不要直接拿 AI 第一次草稿进生产。",
+          "在提示词里加“自我反思”，能拦截掉大量显而易见的问题。"
+        ]
+      }
+    },
+    {
+      "id": "application-overview",
+      "type": "concept",
+      "eyebrow": "落地应用场景",
+      "title": "前面讲的技术，最终都要回到两类真实价值：个人提效与团队提效",
+      "subtitle": "CoT 解决怎么想清楚，RAG 解决怎么拿到对的上下文，ToT 解决怎么在多个方案里做更稳妥的决策。",
+      "payload": {
+        "lead": "Prompt Engineering 不应该停留在概念层。它要落在需求开发、上线评审、测试设计和风险排查这些团队每天都在做的工作里。",
+        "blocks": [
+          {
+            "label": "CoT",
+            "value": "想清楚",
+            "description": "先输出改动清单、风险点和影响范围，再进入具体代码和方案。"
+          },
+          {
+            "label": "RAG",
+            "value": "拿对上下文",
+            "description": "让模型基于项目代码、内部文档和升级脚本回答，而不是闭卷猜测。"
+          },
+          {
+            "label": "ToT",
+            "value": "做稳妥决策",
+            "description": "遇到发布路径、架构方案、跨模块变更时，先多方案比较再收敛。"
+          },
+          {
+            "label": "模板化",
+            "value": "沉淀团队资产",
+            "description": "把高质量 Prompt 固化成模板，形成可复盘、可审计、可复用的方法库。"
+          }
+        ],
+        "emphasis": {
+          "title": "过渡结论",
+          "body": "三者结合后，既能提升个人编码效率，也能提升团队交付质量。"
+        }
+      }
+    },
+    {
+      "id": "personal-assistant",
+      "type": "case-study",
+      "eyebrow": "场景 1",
+      "title": "个人提效：需求开发助手（CoT + RAG）",
+      "subtitle": "先喂上下文，再让模型按固定步骤输出改动计划，避免直接一把梭写代码。",
+      "payload": {
+        "scenarioLabel": "Application",
+        "scenario": "“需求开发助手”工作流",
+        "challengeLabel": "项目内可落地做法",
+        "challenge": [
+          "先把 `mg-module-ems` 现有设备域代码作为检索语料，让模型看见真实上下文",
+          "要求模型固定按 Controller -> Service -> Mapper -> SQL -> 测试 的顺序思考",
+          "输出可执行任务单，而不是一整段无法审查的大块代码"
+        ],
+        "beforeLabel": "可复用 Prompt 模板",
+        "beforePrompt": "你是本项目 Java 开发助手。\n先基于检索到的 `ems_equipment` 相关代码，按“Controller -> Service -> Mapper -> SQL -> 测试”给出改动计划；\n再逐项生成变更草案；\n每一步必须写“影响文件、风险点、回滚方式”；\n不允许跳步，不允许省略 SQL 兼容性说明。",
+        "afterLabel": "预期产物",
+        "afterPrompt": "1. 改动计划\n- Controller: 新增字段入参\n- Service: 校验与领域逻辑\n- Mapper / XML: 字段持久化\n- SQL: 兼容历史数据\n- 测试: 正向 / 异常 / 回滚验证\n\n2. 风险点\n3. 回滚方式",
+        "outcomes": [
+          {
+            "label": "工作方式",
+            "value": "先计划后落地"
+          },
+          {
+            "label": "交付稳定性",
+            "value": "明显提升"
+          },
+          {
+            "label": "收益",
+            "value": "可审计"
+          }
+        ],
+        "learningsLabel": "收益",
+        "learnings": [
+          "把“拍脑袋改代码”变成“先计划、后落地、可审计”。",
+          "个人交付稳定性提升，漏改和误改明显减少。",
+          "这类 Prompt 很适合作为个人开发的固定工作流。"
+        ]
+      }
+    },
+    {
+      "id": "team-review",
+      "type": "case-study",
+      "eyebrow": "场景 2",
+      "title": "团队提效：发布前变更评审助手（RAG + ToT）",
+      "subtitle": "面对多模块与数据库升级脚本，重点不是让 AI 给一个答案，而是输出多条上线方案和对比依据。",
+      "payload": {
+        "scenarioLabel": "Application",
+        "scenario": "“发布前变更评审助手”工作流",
+        "challengeLabel": "项目内可落地做法",
+        "challenge": [
+          "检索本次变更涉及模块与 `backend/db/升级` 脚本，构成发布上下文",
+          "让模型并行评估先上 SQL、先上服务、灰度发布三条路径",
+          "输出对比表、最终建议、回滚步骤和发布后观察指标，而不是只给一句建议"
+        ],
+        "beforeLabel": "可复用 Prompt 模板",
+        "beforePrompt": "你是发布评审助手。\n请根据本次变更文件（业务模块 + db 升级脚本）构建 3 条上线方案（A/B/C），\n对每条方案评估：失败概率、影响面、回滚步骤、验证清单，\n最后推荐方案并说明拒绝其他方案的理由。\n输出格式必须是对比表 + 最终建议 + 发布后观察指标。",
+        "afterLabel": "预期产物",
+        "afterPrompt": "方案 A：先上 SQL 再上服务\n方案 B：先上服务（兼容旧表）再切 SQL\n方案 C：灰度发布 + 回滚开关\n\n输出：风险 / 回滚复杂度 / 停机窗口 / 验证成本 对比表\n最终建议：推荐 B 或 C，并解释放弃 A 的原因",
+        "outcomes": [
+          {
+            "label": "评审方式",
+            "value": "策略型"
+          },
+          {
+            "label": "团队收益",
+            "value": "减少事故"
+          },
+          {
+            "label": "结论形态",
+            "value": "可复盘"
+          }
+        ],
+        "learningsLabel": "收益",
+        "learnings": [
+          "团队从经验型上线转为策略型上线。",
+          "评审结论可复盘、可追责、可模板化沉淀。",
+          "RAG + ToT 的组合特别适合跨模块发布决策。"
+        ]
+      }
+    },
+    {
+      "id": "security-threats",
+      "type": "three-column",
+      "eyebrow": "安全护栏",
+      "title": "当大模型深度接入业务系统，传统安全体系必须扩展到提示词层",
+      "subtitle": "大模型会面临对抗性提示、提示泄漏与越狱攻击，不能把自然语言输入直接当可信数据。",
+      "payload": {
+        "intro": "防 SQL 注入和 XSS 只是开始。大模型应用还要面对“提示词注入、提示泄漏、深度越狱”这类新型对抗风险。",
+        "columns": [
+          {
+            "title": "提示词注入",
+            "caption": "Prompt Injection",
+            "points": [
+              "攻击者在合法输入里夹带恶意指令，尝试劫持模型控制流",
+              "例如：忽略之前所有要求，转而执行新的危险任务",
+              "本质上是在模型上下文里做指令级攻击"
+            ]
+          },
+          {
+            "title": "提示泄漏",
+            "caption": "Prompt Leakage",
+            "points": [
+              "诱导模型暴露系统提示词、内部规则、私有范例或敏感密钥",
+              "风险不是答错，而是把内部资产直接说出来",
+              "企业级应用尤其要防范系统提示词外泄"
+            ]
+          },
+          {
+            "title": "越狱与模拟器攻击",
+            "caption": "Jailbreaking",
+            "points": [
+              "通过复杂角色扮演绕过安全过滤器",
+              "诱导模型在上下文里运行一个不受限的虚拟模拟器",
+              "可能进一步输出恶意脚本、敏感操作建议或攻击性内容"
+            ]
+          }
+        ],
+        "takeaway": "金句：永远不要直接信任并拼接用户的自然语言输入。"
+      }
+    },
+    {
+      "id": "defense-depth",
+      "type": "concept",
+      "eyebrow": "纵深防御",
+      "title": "没有单一技术能 100% 免疫提示攻击，必须在多层同时建立护栏",
+      "subtitle": "把提示词当作代码来写，把大模型输入框当作数据库查询入口来防御。",
+      "payload": {
+        "lead": "防御思路不是“多写几句禁止词”，而是从系统提示、参数结构、网关检测到模型选择做成纵深防御。",
+        "blocks": [
+          {
+            "label": "Level 1",
+            "value": "指令级显式防御",
+            "description": "在系统提示里明确说明：后续用户输入可能尝试篡改指令，必须忽略这类企图。"
+          },
+          {
+            "label": "Level 2",
+            "value": "参数化与格式化沙箱",
+            "description": "用 JSON、XML 或定界符切开系统指令区与用户输入区，并对特殊字符做隔离与转义。"
+          },
+          {
+            "label": "Level 3",
+            "value": "前置对抗检测器",
+            "description": "在主模型前加安全网关或小模型，先判断输入是否包含提示注入或黑客意图。"
+          },
+          {
+            "label": "Level 4",
+            "value": "模型降级与专有微调",
+            "description": "在高安全级业务里，必要时使用更可控的基础模型或经过安全样本固化的专有模型。"
+          }
+        ],
+        "emphasis": {
+          "title": "Waluigi 效应启示",
+          "body": "安全护栏的用语要客观、中性、结构严谨，避免用强情绪化的禁止词去刺激模型触发异常对抗逻辑。"
+        },
+        "quote": "把提示词当作代码来写，把大模型的输入框当作数据库查询入口来防御。"
+      }
+    },
+    {
+      "id": "summary-close",
+      "type": "summary",
+      "eyebrow": "总结",
+      "title": "这套分享最终服务的，不是“会不会用 AI”，而是团队如何稳定表达与稳定交付",
+      "subtitle": "从开篇定位、技术核心、场景落地到安全护栏，这套 deck 现在已经覆盖了完整讲稿主线。",
+      "payload": {
+        "pillars": [
+          {
+            "title": "先讲清问题",
+            "detail": "目标、对象、背景和边界先于工具选择，这是所有 Prompt 技术的起点。"
+          },
+          {
+            "title": "再选对方法",
+            "detail": "Zero-shot、RAG、ToT、ReAct、Reflexion 等方法要按任务类型搭配，而不是乱用。"
+          },
+          {
+            "title": "最后接进流程",
+            "detail": "个人助手、团队评审、发布决策和安全网关，才是方法真正落地的位置。"
+          },
+          {
+            "title": "持续沉淀模板",
+            "detail": "把高质量 Prompt、输出结构和安全规则沉淀成团队资产，而不是个人经验。"
+          }
+        ],
+        "nextSteps": [
+          "继续把剩余讲稿内容迭代成更细的 slide JSON 或按章节拆分 deck",
+          "为每类技术模板补充可切换的示例数据，支持 AI 自动生成更多演示稿",
+          "把个人提效与团队评审类 Prompt 固化为团队常用模板库"
+        ],
+        "closing": "Prompt Engineering 不是技巧堆砌，而是一套让 AI 更稳、更准、更可落地地服务团队协作与研发交付的方法论。"
+      }
+    }
+  ]
+}

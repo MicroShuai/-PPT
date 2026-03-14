@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background-color: #f2f6fc;
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  color: #122033;
+  background:
+    linear-gradient(180deg, rgba(248, 250, 252, 0.76), rgba(241, 245, 251, 0.88)),
+    url('/images/presentation-bg.png') center center / cover no-repeat fixed;
+}
+
+body::before {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  content: '';
+  background:
+    radial-gradient(circle at 24% 18%, rgba(152, 191, 255, 0.38), transparent 30%),
+    radial-gradient(circle at 78% 22%, rgba(186, 213, 255, 0.26), transparent 26%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.24));
+}
+
+body::after {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  content: '';
+  opacity: 0.45;
+  background-image:
+    linear-gradient(rgba(90, 141, 238, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(90, 141, 238, 0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(180deg, rgba(255, 255, 255, 0.8), transparent 76%);
+}
+
+::selection {
+  color: #0f172a;
+  background: rgba(152, 191, 255, 0.72);
+}
+
+.reveal {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.reveal .slides {
+  text-align: left;
+}
+
+.reveal .slides section {
+  height: 100%;
+}
+
+.reveal .controls {
+  color: #5a8dee;
+}
+
+.reveal .progress {
+  color: rgba(90, 141, 238, 0.8);
+  height: 4px;
+}
+
+.reveal .slide-number {
+  padding: 8px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.58);
+  color: #52627a;
+  font-size: 14px;
+  backdrop-filter: blur(12px);
+}
+
+@layer components {
+  .slide-shell {
+    @apply relative h-full w-full overflow-hidden rounded-[32px] border border-deck-line bg-[linear-gradient(180deg,rgba(255,255,255,0.74),rgba(246,249,253,0.9))] shadow-panel backdrop-blur-md;
+  }
+
+  .slide-shell::before {
+    position: absolute;
+    inset: 0;
+    content: '';
+    background:
+      radial-gradient(circle at top right, rgba(152, 191, 255, 0.3), transparent 26%),
+      radial-gradient(circle at left center, rgba(255, 255, 255, 0.36), transparent 38%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.4), transparent 32%);
+    pointer-events: none;
+  }
+
+  .slide-inner {
+    @apply relative flex h-full w-full flex-col gap-7 px-12 py-9;
+  }
+
+  .slide-eyebrow {
+    @apply inline-flex w-fit items-center rounded-full border border-blue-300/50 bg-blue-50/90 px-4 py-1 text-sm font-medium uppercase tracking-[0.24em] text-blue-700;
+  }
+
+  .slide-title {
+    @apply max-w-5xl text-[38px] font-semibold leading-tight text-slate-900;
+  }
+
+  .slide-subtitle {
+    @apply max-w-4xl text-[18px] leading-7 text-slate-600;
+  }
+
+  .slide-panel {
+    @apply rounded-[24px] border border-deck-line bg-white/70 shadow-panel backdrop-blur-md;
+  }
+
+  .slide-panel-soft {
+    @apply rounded-[20px] border border-slate-200/80 bg-white/50;
+  }
+
+  .slide-label {
+    @apply text-xs font-semibold uppercase tracking-[0.2em] text-slate-500;
+  }
+
+  .slide-kpi {
+    @apply text-[34px] font-semibold leading-none text-slate-900;
+  }
+
+  .text-strong {
+    @apply font-semibold text-blue-700;
+  }
+
+  .text-key {
+    @apply font-semibold text-amber-700;
+  }
+}
