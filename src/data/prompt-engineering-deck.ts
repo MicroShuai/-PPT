@@ -14,17 +14,20 @@ const slideVariantMap: Record<string, string> = {
   'ai-strengths': 'matrix',
   'prompt-value': 'matrix',
   'active-prompt': 'matrix',
-  'self-consistency': 'selector',
+  'self-consistency': 'dossier',
   'defense-depth': 'layers',
   'absolute-mode': 'manifesto',
+  'cot-transaction': 'dossier',
   'rag': 'dossier',
   'tree-of-thoughts': 'dossier',
   'reflexion': 'dossier',
   'personal-assistant': 'workflow',
   'team-review': 'workflow',
+  'team-review-routes': 'dossier',
   'prompt-chaining': 'route',
   'art': 'control',
-  'react': 'loop',
+  'react': 'runtime',
+  'react-execution-map': 'canvas',
   'summary-close': 'closing'
 };
 

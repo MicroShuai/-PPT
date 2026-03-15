@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import { toRef } from 'vue';
 import SlideShell from '@/components/common/SlideShell.vue';
+import { useSlideMotion } from '@/composables/useSlideMotion';
 import type { AgendaSlideDefinition } from '@/types/slide';
 
-defineProps<{
+const props = defineProps<{
   slide: AgendaSlideDefinition;
 }>();
+
+const { motion } = useSlideMotion(toRef(props, 'slide'));
 </script>
 
 <template>
@@ -17,7 +21,8 @@ defineProps<{
           <article
             v-for="(item, index) in slide.payload.items"
             :key="item.title"
-            class="slide-rail-card fragment pl-16 pr-5 py-4"
+            class="slide-rail-card pl-16 pr-5 py-4"
+            v-bind="motion('rail', index)"
           >
             <div class="absolute left-0 top-4 flex h-11 w-11 items-center justify-center rounded-[16px] border border-blue-200 bg-white/90 text-base font-semibold text-blue-700 shadow-sm">
               {{ String(index + 1).padStart(2, '0') }}
@@ -41,7 +46,10 @@ defineProps<{
       </div>
 
       <aside class="grid min-h-0 grid-rows-[auto_1fr_auto] gap-4">
-        <div class="slide-stage px-6 py-5">
+        <div
+          class="slide-stage px-6 py-5"
+          v-bind="motion('aside')"
+        >
           <p class="slide-label mb-3 text-blue-700/80">
             Roadmap Intent
           </p>
@@ -54,7 +62,8 @@ defineProps<{
           <div
             v-for="(point, index) in slide.payload.aside.points"
             :key="point"
-            class="slide-frost fragment px-4 py-3.5"
+            class="slide-frost px-4 py-3.5"
+            v-bind="motion('checkpoint', index)"
           >
             <div class="flex items-start gap-4">
               <span class="slide-number-chip !h-10 !w-10 !rounded-2xl !text-base">
@@ -69,9 +78,10 @@ defineProps<{
 
         <div class="flex flex-wrap gap-2.5">
           <span
-            v-for="item in slide.payload.items"
+            v-for="(item, index) in slide.payload.items"
             :key="`${item.title}-${item.tag}`"
             class="slide-ribbon !px-3 !py-1 !text-[11px]"
+            v-bind="motion('tag', index)"
           >
             {{ item.tag }}
           </span>

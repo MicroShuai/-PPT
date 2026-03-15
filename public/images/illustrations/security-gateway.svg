@@ -1,0 +1,41 @@
+<svg width="800" height="520" viewBox="0 0 800 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="520" rx="36" fill="#F7FAFF"/>
+  <rect x="24" y="24" width="752" height="472" rx="30" stroke="#D7E5FB" stroke-width="2"/>
+  <circle cx="136" cy="128" r="90" fill="url(#paint0_radial)"/>
+  <circle cx="676" cy="112" r="70" fill="url(#paint1_radial)"/>
+  <g filter="url(#filter0_d)">
+    <rect x="126" y="108" width="548" height="286" rx="34" fill="white"/>
+    <rect x="126.75" y="108.75" width="546.5" height="284.5" rx="33.25" stroke="#D7E5FB" stroke-width="1.5"/>
+  </g>
+  <rect x="160" y="148" width="156" height="206" rx="28" fill="#F8FBFF" stroke="#D7E5FB" stroke-width="1.5"/>
+  <path d="M238 184L286 202V244C286 282 262 317 238 330C214 317 190 282 190 244V202L238 184Z" fill="#EAF2FF" stroke="#5A8DEE" stroke-width="4"/>
+  <path d="M220 244L232 256L256 228" stroke="#5A8DEE" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="342" y="146" width="298" height="54" rx="20" fill="#EDF5FF"/>
+  <rect x="342" y="224" width="298" height="54" rx="20" fill="#FFF8E8"/>
+  <rect x="342" y="302" width="298" height="54" rx="20" fill="#F8FBFF"/>
+  <text x="370" y="179" fill="#4F7FE6" font-size="20" font-family="Arial, sans-serif" font-weight="700">INPUT FILTER</text>
+  <text x="370" y="257" fill="#B7791F" font-size="20" font-family="Arial, sans-serif" font-weight="700">SECURITY GATE</text>
+  <text x="370" y="335" fill="#607086" font-size="20" font-family="Arial, sans-serif" font-weight="700">AUDIT / FALLBACK</text>
+  <path d="M316 173H342" stroke="#BFD4FD" stroke-width="4" stroke-linecap="round"/>
+  <path d="M316 251H342" stroke="#D6B25B" stroke-width="4" stroke-linecap="round"/>
+  <path d="M316 329H342" stroke="#BFD4FD" stroke-width="4" stroke-linecap="round"/>
+  <defs>
+    <filter id="filter0_d" x="90" y="86" width="620" height="358" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="16"/>
+      <feGaussianBlur stdDeviation="18"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.592157 0 0 0 0 0.686275 0 0 0 0 0.823529 0 0 0 0.28 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_5"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_5" result="shape"/>
+    </filter>
+    <radialGradient id="paint0_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(136 128) rotate(90) scale(90)">
+      <stop stop-color="#DCEAFF"/>
+      <stop offset="1" stop-color="#DCEAFF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="paint1_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(676 112) rotate(90) scale(70)">
+      <stop stop-color="#E9F2FF"/>
+      <stop offset="1" stop-color="#E9F2FF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>

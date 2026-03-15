@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, toRef } from 'vue';
+import SlideMediaPanel from '@/components/common/SlideMediaPanel.vue';
 import SlideShell from '@/components/common/SlideShell.vue';
+import { useSlideMotion } from '@/composables/useSlideMotion';
 import type { ConceptSlideDefinition } from '@/types/slide';
 
 const props = defineProps<{
@@ -8,6 +10,7 @@ const props = defineProps<{
 }>();
 
 const layout = computed(() => props.slide.variant ?? (props.slide.payload.blocks.length > 3 ? 'matrix' : 'spotlight'));
+const { motion } = useSlideMotion(toRef(props, 'slide'));
 </script>
 
 <template>
@@ -16,14 +19,30 @@ const layout = computed(() => props.slide.variant ?? (props.slide.payload.blocks
       v-if="layout === 'layers'"
       class="grid h-full min-h-0 grid-rows-[auto_1fr_auto] gap-5"
     >
-      <div class="grid grid-cols-[1.08fr_0.92fr] gap-5">
-        <div class="slide-stage px-6 py-5">
+      <div
+        class="grid gap-5"
+        :class="slide.media ? 'grid-cols-[0.92fr_0.56fr_0.72fr]' : 'grid-cols-[1.08fr_0.92fr]'"
+      >
+        <div
+          class="slide-stage px-6 py-5"
+          v-bind="motion('lead')"
+        >
           <p class="text-lg leading-7 text-slate-700">
             {{ slide.payload.lead }}
           </p>
         </div>
 
-        <div class="slide-frost px-6 py-5">
+        <SlideMediaPanel
+          v-if="slide.media"
+          :media="slide.media"
+          compact
+          v-bind="motion('media')"
+        />
+
+        <div
+          class="slide-frost px-6 py-5"
+          v-bind="motion('panel')"
+        >
           <p class="slide-label mb-3 text-blue-700/80">
             {{ slide.payload.emphasis.title }}
           </p>
@@ -37,7 +56,8 @@ const layout = computed(() => props.slide.variant ?? (props.slide.payload.blocks
         <article
           v-for="(block, index) in slide.payload.blocks"
           :key="`${block.label}-${block.value}`"
-          class="slide-stage fragment flex flex-col justify-between gap-6 p-6"
+          class="slide-stage flex flex-col justify-between gap-6 p-6"
+          v-bind="motion('card', index)"
         >
           <div class="flex items-start justify-between gap-4">
             <div class="space-y-3">
@@ -61,6 +81,7 @@ const layout = computed(() => props.slide.variant ?? (props.slide.payload.blocks
       <div
         v-if="slide.payload.quote"
         class="slide-quote-card px-6 py-4"
+        v-bind="motion('quote')"
       >
         <p class="relative text-base leading-7 text-amber-900">
           “{{ slide.payload.quote }}”
@@ -73,13 +94,19 @@ const layout = computed(() => props.slide.variant ?? (props.slide.payload.blocks
       class="grid h-full min-h-0 grid-cols-[0.96fr_1.04fr] gap-5"
     >
       <div class="grid min-h-0 grid-rows-[auto_1fr_auto] gap-4">
-        <div class="slide-stage px-6 py-4">
+        <div
+          class="slide-stage px-6 py-4"
+          v-bind="motion('lead')"
+        >
           <p class="text-base leading-7 text-slate-700">
             {{ slide.payload.lead }}
           </p>
         </div>
 
-        <div class="slide-frost flex min-h-0 flex-col justify-between px-6 py-4">
+        <div
+          class="slide-frost flex min-h-0 flex-col justify-between px-6 py-4"
+          v-bind="motion('panel')"
+        >
           <div>
             <p class="slide-label mb-3 text-blue-700/80">
               {{ slide.payload.emphasis.title }}
@@ -93,6 +120,7 @@ const layout = computed(() => props.slide.variant ?? (props.slide.payload.blocks
         <div
           v-if="slide.payload.quote"
           class="slide-ribbon !px-3 !py-1.5"
+          v-bind="motion('tag')"
         >
           {{ slide.payload.quote }}
         </div>
@@ -102,7 +130,8 @@ const layout = computed(() => props.slide.variant ?? (props.slide.payload.blocks
         <article
           v-for="(block, index) in slide.payload.blocks"
           :key="`${block.label}-${block.value}`"
-          class="slide-rail-card fragment pl-10 pr-5 py-4"
+          class="slide-rail-card pl-10 pr-5 py-4"
+          v-bind="motion('rail', index)"
         >
           <div class="mb-3 flex items-center justify-between gap-3">
             <p class="slide-label text-blue-700/80">
@@ -126,14 +155,30 @@ const layout = computed(() => props.slide.variant ?? (props.slide.payload.blocks
       v-else-if="layout === 'matrix'"
       class="grid h-full min-h-0 grid-rows-[auto_1fr_auto] gap-5"
     >
-      <div class="grid grid-cols-[1.1fr_0.9fr] gap-5">
-        <div class="slide-stage px-6 py-5">
+      <div
+        class="grid gap-5"
+        :class="slide.media ? 'grid-cols-[0.86fr_0.56fr_0.58fr]' : 'grid-cols-[1.1fr_0.9fr]'"
+      >
+        <div
+          class="slide-stage px-6 py-5"
+          v-bind="motion('lead')"
+        >
           <p class="text-lg leading-7 text-slate-700">
             {{ slide.payload.lead }}
           </p>
         </div>
 
-        <div class="slide-frost px-6 py-5">
+        <SlideMediaPanel
+          v-if="slide.media"
+          :media="slide.media"
+          compact
+          v-bind="motion('media')"
+        />
+
+        <div
+          class="slide-frost px-6 py-5"
+          v-bind="motion('panel')"
+        >
           <p class="slide-label mb-3 text-blue-700/80">
             {{ slide.payload.emphasis.title }}
           </p>
@@ -147,8 +192,9 @@ const layout = computed(() => props.slide.variant ?? (props.slide.payload.blocks
         <article
           v-for="(block, index) in slide.payload.blocks"
           :key="`${block.label}-${block.value}`"
-          class="slide-stage fragment flex flex-col justify-between gap-6 p-6"
+          class="slide-stage flex flex-col justify-between gap-6 p-6"
           :class="index % 2 === 1 ? 'translate-y-4' : ''"
+          v-bind="motion('card', index)"
         >
           <div class="space-y-4">
             <p class="slide-label text-blue-700/80">
@@ -167,6 +213,7 @@ const layout = computed(() => props.slide.variant ?? (props.slide.payload.blocks
       <div
         v-if="slide.payload.quote"
         class="slide-ribbon"
+        v-bind="motion('quote')"
       >
         {{ slide.payload.quote }}
       </div>
@@ -176,14 +223,30 @@ const layout = computed(() => props.slide.variant ?? (props.slide.payload.blocks
       v-else
       class="grid h-full min-h-0 grid-cols-[0.98fr_1.02fr] gap-6"
     >
-      <div class="grid min-h-0 grid-rows-[auto_1fr_auto] gap-5">
-        <div class="slide-stage px-6 py-6">
+      <div
+        class="grid min-h-0 gap-5"
+        :class="slide.media ? 'grid-rows-[auto_minmax(0,0.9fr)_1fr_auto]' : 'grid-rows-[auto_1fr_auto]'"
+      >
+        <div
+          class="slide-stage px-6 py-6"
+          v-bind="motion('lead')"
+        >
           <p class="text-[22px] leading-8 text-slate-700">
             {{ slide.payload.lead }}
           </p>
         </div>
 
-        <div class="slide-frost flex min-h-0 flex-col justify-between px-6 py-6">
+        <SlideMediaPanel
+          v-if="slide.media"
+          :media="slide.media"
+          compact
+          v-bind="motion('media')"
+        />
+
+        <div
+          class="slide-frost flex min-h-0 flex-col justify-between px-6 py-6"
+          v-bind="motion('panel')"
+        >
           <div>
             <p class="slide-label mb-3 text-blue-700/80">
               {{ slide.payload.emphasis.title }}
@@ -197,6 +260,7 @@ const layout = computed(() => props.slide.variant ?? (props.slide.payload.blocks
         <div
           v-if="slide.payload.quote"
           class="slide-quote-card px-6 py-4"
+          v-bind="motion('quote')"
         >
           <p class="relative text-base leading-7 text-amber-900">
             “{{ slide.payload.quote }}”
@@ -208,8 +272,9 @@ const layout = computed(() => props.slide.variant ?? (props.slide.payload.blocks
         <article
           v-for="(block, index) in slide.payload.blocks"
           :key="`${block.label}-${block.value}`"
-          class="slide-stage fragment flex flex-col justify-between gap-6 p-6"
+          class="slide-stage flex flex-col justify-between gap-6 p-6"
           :class="index === 1 ? 'ml-6' : index === 2 ? 'ml-12' : ''"
+          v-bind="motion('card', index)"
         >
           <div class="flex items-start justify-between gap-4">
             <div class="space-y-3">

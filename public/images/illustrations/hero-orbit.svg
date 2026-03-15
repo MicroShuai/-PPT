@@ -1,0 +1,57 @@
+<svg width="800" height="520" viewBox="0 0 800 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="520" rx="36" fill="#F7FAFF"/>
+  <rect x="24" y="24" width="752" height="472" rx="30" stroke="#D7E5FB" stroke-width="2"/>
+  <circle cx="160" cy="120" r="110" fill="url(#paint0_radial)" opacity="0.7"/>
+  <circle cx="670" cy="92" r="86" fill="url(#paint1_radial)" opacity="0.72"/>
+  <circle cx="654" cy="406" r="110" fill="url(#paint2_radial)" opacity="0.5"/>
+  <path d="M122 248C184 170 312 126 404 132C527 140 631 214 684 316" stroke="#C3D8FF" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="7 10"/>
+  <path d="M142 388C220 434 338 446 434 418C520 394 610 326 642 252" stroke="#DDE8FB" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="10 12"/>
+  <circle cx="146" cy="252" r="14" fill="#FDFEFF" stroke="#9FC0FF" stroke-width="3"/>
+  <circle cx="680" cy="316" r="14" fill="#FDFEFF" stroke="#9FC0FF" stroke-width="3"/>
+  <circle cx="142" cy="388" r="14" fill="#FDFEFF" stroke="#C5D8F8" stroke-width="3"/>
+  <circle cx="642" cy="252" r="14" fill="#FDFEFF" stroke="#C5D8F8" stroke-width="3"/>
+  <g filter="url(#filter0_d)">
+    <rect x="198" y="106" width="406" height="288" rx="34" fill="white"/>
+    <rect x="198.75" y="106.75" width="404.5" height="286.5" rx="33.25" stroke="#D7E5FB" stroke-width="1.5"/>
+  </g>
+  <rect x="226" y="136" width="120" height="42" rx="16" fill="#EAF2FF"/>
+  <text x="254" y="162" fill="#4F7FE6" font-size="20" font-family="Arial, sans-serif" font-weight="700">PROMPT</text>
+  <rect x="358" y="136" width="120" height="42" rx="16" fill="#F7F9FE" stroke="#D7E5FB"/>
+  <text x="388" y="162" fill="#6A7D9A" font-size="20" font-family="Arial, sans-serif" font-weight="700">CONTEXT</text>
+  <rect x="490" y="136" width="88" height="42" rx="16" fill="#FFF5DD"/>
+  <text x="514" y="162" fill="#B7791F" font-size="20" font-family="Arial, sans-serif" font-weight="700">GOAL</text>
+  <rect x="228" y="208" width="346" height="132" rx="24" fill="#F8FBFF" stroke="#D7E5FB" stroke-width="1.5"/>
+  <rect x="252" y="234" width="156" height="14" rx="7" fill="#BDD3FF"/>
+  <rect x="252" y="262" width="202" height="14" rx="7" fill="#E2ECFC"/>
+  <rect x="252" y="290" width="174" height="14" rx="7" fill="#E2ECFC"/>
+  <rect x="594" y="208" width="0" height="0" fill="none"/>
+  <rect x="456" y="226" width="94" height="94" rx="24" fill="#EDF5FF"/>
+  <path d="M482 258H524" stroke="#5A8DEE" stroke-width="10" stroke-linecap="round"/>
+  <path d="M482 286H510" stroke="#5A8DEE" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="522" cy="286" r="18" fill="#DCEAFF"/>
+  <path d="M438 360H562" stroke="#D7E5FB" stroke-width="2"/>
+  <text x="226" y="366" fill="#607086" font-size="18" font-family="Arial, sans-serif">Turn fuzzy requirements into structured execution.</text>
+  <defs>
+    <filter id="filter0_d" x="160" y="84" width="482" height="364" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="16"/>
+      <feGaussianBlur stdDeviation="19"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.592157 0 0 0 0 0.686275 0 0 0 0 0.823529 0 0 0 0.28 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_1"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_0_1" result="shape"/>
+    </filter>
+    <radialGradient id="paint0_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(160 120) rotate(90) scale(110)">
+      <stop stop-color="#BBD2FF"/>
+      <stop offset="1" stop-color="#BBD2FF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="paint1_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(670 92) rotate(90) scale(86)">
+      <stop stop-color="#E8F1FF"/>
+      <stop offset="1" stop-color="#E8F1FF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="paint2_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(654 406) rotate(90) scale(110)">
+      <stop stop-color="#D9E7FF"/>
+      <stop offset="1" stop-color="#D9E7FF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>

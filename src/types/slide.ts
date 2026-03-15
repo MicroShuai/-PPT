@@ -15,6 +15,13 @@ export interface DeckMeta {
   backgroundImage: string;
 }
 
+export interface SlideMedia {
+  src: string;
+  alt: string;
+  caption?: string;
+  fit?: 'cover' | 'contain';
+}
+
 export interface PresentationDeck {
   meta: DeckMeta;
   slides: AnySlideDefinition[];
@@ -27,6 +34,7 @@ export interface BaseSlideDefinition<T extends SlideType, P> {
   eyebrow?: string;
   title: string;
   subtitle?: string;
+  media?: SlideMedia;
   payload: P;
 }
 
@@ -115,6 +123,15 @@ export interface FlowSlidePayload {
   mermaid: string;
   checkpoints: string[];
   takeaway: string;
+  promptPanel?: {
+    title: string;
+    instruction: string;
+    tools: Array<{
+      name: string;
+      detail: string;
+    }>;
+    task: string;
+  };
 }
 
 export interface SummaryPillar {

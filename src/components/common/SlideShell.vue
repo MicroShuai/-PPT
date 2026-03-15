@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { toRef } from 'vue';
+import { useSlideMotion } from '@/composables/useSlideMotion';
 import type { AnySlideDefinition } from '@/types/slide';
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     slide: AnySlideDefinition;
     align?: 'start' | 'center';
@@ -10,6 +12,8 @@ withDefaults(
     align: 'start'
   }
 );
+
+const { shellMotion } = useSlideMotion(toRef(props, 'slide'));
 </script>
 
 <template>
@@ -29,16 +33,21 @@ withDefaults(
         <p
           v-if="slide.eyebrow"
           class="slide-eyebrow"
+          v-bind="shellMotion('eyebrow')"
         >
           {{ slide.eyebrow }}
         </p>
         <div class="space-y-3">
-          <h1 class="slide-title">
+          <h1
+            class="slide-title"
+            v-bind="shellMotion('title')"
+          >
             {{ slide.title }}
           </h1>
           <p
             v-if="slide.subtitle"
             class="slide-subtitle"
+            v-bind="shellMotion('subtitle')"
           >
             {{ slide.subtitle }}
           </p>

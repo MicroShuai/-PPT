@@ -12,38 +12,50 @@
       "type": "cover",
       "eyebrow": "内部技术分享",
       "title": "提示词工程与 AI 提效分享",
-      "subtitle": "抛开 tools 清单，回到一个更根本的问题：AI 能否真正进入团队协作与研发链路。",
+      "subtitle": "抛开 skills、MCP、AI CLI、AI Agent 这些工具名词，回到一个更根本的问题：AI 到底能怎样进入团队协作与研发链路？",
+      "media": {
+        "src": "/images/illustrations/hero-orbit.svg",
+        "alt": "Prompt engineering hero illustration",
+        "caption": "把模糊需求收敛成结构化任务，再进入 AI 执行流程。",
+        "fit": "contain"
+      },
       "payload": {
-        "speaker": "前端化 PPT 演示系统 Demo",
-        "headline": "AI 的价值，不在于有没有工具，而在于团队能否把模糊问题表达成可执行任务。",
+        "speaker": "Prompt Engineering / 内部分享",
+        "headline": "AI 提效的关键，不只是有没有工具，而是能不能把模糊问题表达成 AI 可执行的任务。",
         "highlights": [
-          "项目沟通协作",
-          "需求传递质量",
-          "研发提效与交付稳定性"
+          "项目经理与开发协作",
+          "需求清晰传递",
+          "研发提效与交付稳定"
         ],
         "metrics": [
           {
-            "label": "覆盖章节",
-            "value": "10 大板块"
+            "label": "覆盖场景",
+            "value": "3 类协作问题"
           },
           {
-            "label": "方法技术",
+            "label": "技术核心",
             "value": "15 类 Prompt 技术"
           },
           {
-            "label": "最终目标",
+            "label": "落地目标",
             "value": "团队级方法论"
           }
         ],
-        "footer": "Prompt Engineering makes AI operational, not ornamental."
+        "footer": "用提示词工程，让 AI 真正成为项目协作和研发提效工具。"
       }
     },
     {
       "id": "positioning-scenarios",
       "type": "three-column",
       "eyebrow": "核心开篇与定位",
-      "title": "这不是单一角色技巧，而是一套覆盖团队协作的表达方法",
-      "subtitle": "分享重点不是某个 AI 工具，而是如何把问题讲清楚，让 AI 稳定产出对团队有价值的结果。",
+      "title": "它不是单一角色技巧，而是覆盖三个典型场景的团队方法",
+      "subtitle": "分享重点不是某个 AI 工具，而是如何把问题讲清楚，让 AI 真正成为项目协作和研发提效工具。",
+      "media": {
+        "src": "/images/illustrations/collaboration-grid.svg",
+        "alt": "Collaboration map illustration",
+        "caption": "PM、开发、文档与交付在同一张协作网里被组织起来。",
+        "fit": "contain"
+      },
       "payload": {
         "intro": "抛开 skills、MCP、CLI、Agent 这些名词，先回答一个问题：AI 可以帮助团队在哪些真实场景里降低成本？",
         "columns": [
@@ -205,6 +217,12 @@
       "eyebrow": "AI 真正擅长什么",
       "title": "AI 最适合优先解决的，是高频、重复、结构化、可描述的任务",
       "subtitle": "它不是替代人做最终判断，而是帮助人更快完成整理、分析、生成和风险暴露。",
+      "media": {
+        "src": "/images/illustrations/ai-workbench.svg",
+        "alt": "AI workbench illustration",
+        "caption": "当任务高频、重复、结构化时，AI 最容易形成稳定产出。",
+        "fit": "contain"
+      },
       "payload": {
         "lead": "项目协作和研发过程中，恰好存在大量结构化环节，这正是 AI 可以率先发挥价值的地方。",
         "blocks": [
@@ -276,7 +294,7 @@
       "id": "prompt-value",
       "type": "concept",
       "eyebrow": "提示词工程的核心价值",
-      "title": "Prompt Engineering 的价值，不是写花哨的话，而是提升可执行性与可控性",
+      "title": "提示词工程的核心价值：把模糊问题变成 AI 可执行的问题",
       "subtitle": "它同时服务于“人和 AI”的协作，也反过来提升“人和人”的沟通质量。",
       "payload": {
         "lead": "当团队学会结构化表达之后，Prompt 就不再只是对模型说话，而是在建立统一的任务描述标准。",
@@ -299,7 +317,7 @@
         ],
         "emphasis": {
           "title": "关键认识",
-          "body": "提示词工程不是技巧集合，而是一套帮助团队稳定表达、稳定协作、稳定交付的方法。"
+          "body": "提示词工程不只是对模型说话的技巧，而是在建立团队统一的任务表达标准。"
         },
         "quote": "结构化表达一旦形成模板，就会同时提升人与 AI、人与人两条协作链路。"
       }
@@ -363,6 +381,12 @@
       "eyebrow": "技术核心总览",
       "title": "提示词工程的含义：让大语言模型在具体场景里稳定工作",
       "subtitle": "它关注提示词的开发和优化，帮助我们更好理解模型的能力边界，并把模型接进真实业务流程。",
+      "media": {
+        "src": "/images/illustrations/prompt-blueprint.svg",
+        "alt": "Prompt blueprint illustration",
+        "caption": "Prompt 不是一句话，而是角色、任务、上下文、约束和输出结构的组合。",
+        "fit": "contain"
+      },
       "payload": {
         "lead": "Prompt Engineering 是一门偏实践的工程学科，目标不是解释模型，而是提高模型在任务中的有效性和可控性。",
         "blocks": [
@@ -517,6 +541,47 @@
       }
     },
     {
+      "id": "cot-transaction",
+      "type": "case-study",
+      "eyebrow": "技术核心 03 延伸",
+      "title": "CoT 实战延伸：逐步分析这个方法是否应该加 @Transactional",
+      "subtitle": "这类题目不是一句“该不该加注解”，而是要把业务动作、失败后果和一致性要求一步一步展开。",
+      "payload": {
+        "scenarioLabel": "Extension",
+        "scenario": "事务一致性判断",
+        "challengeLabel": "为什么适合用 CoT",
+        "challenge": [
+          "该方法包含两次数据库写操作，判断重点不只是“能不能写”，而是它们是否属于同一个业务动作。",
+          "如果第二步失败但第一步已成功，就会留下不一致数据，这正是 CoT 擅长逐步解释的判断题。",
+          "把“动作 -> 业务关系 -> 失败后果 -> 结论”拆开，比一句直接结论更容易被研发接受。"
+        ],
+        "beforeLabel": "Prompt",
+        "beforePrompt": "请一步一步分析下面这个方法是否应该加 @Transactional，并说明原因。\n\n场景：\n该方法会先保存订单主表，再保存订单明细表。\n如果第二步失败，第一步也必须回滚。\n\n请按以下格式输出：\n第1步：\n第2步：\n第3步：\n结论：",
+        "afterLabel": "AI 输出",
+        "afterPrompt": "第1步：该方法包含两次数据库写操作，分别是订单主表和订单明细表。\n第2步：这两个操作属于同一个业务动作，要求要么都成功，要么都失败。\n第3步：如果第二步失败但第一步成功，会导致数据不一致。\n\n结论：该方法应该加 @Transactional，以保证事务一致性。",
+        "outcomes": [
+          {
+            "label": "写操作",
+            "value": "2 次"
+          },
+          {
+            "label": "业务要求",
+            "value": "同成败"
+          },
+          {
+            "label": "结论",
+            "value": "应加 @Transactional"
+          }
+        ],
+        "learningsLabel": "实战认识",
+        "learnings": [
+          "CoT 很适合分析事务边界、回滚条件和一致性要求。",
+          "先把业务动作与失败后果讲清楚，再下事务结论，结果更稳也更容易审查。",
+          "这类逐步判断题，尤其适合订单、库存、入库联动等强一致业务。"
+        ]
+      }
+    },
+    {
       "id": "meta-prompting",
       "type": "case-study",
       "eyebrow": "技术核心 04",
@@ -559,39 +624,43 @@
     },
     {
       "id": "self-consistency",
-      "type": "concept",
+      "type": "case-study",
       "eyebrow": "技术核心 05",
       "title": "一致性自检：不是只想一次，而是从多条推理路径里选择最一致的答案",
       "subtitle": "它通过多路径思考和结果收敛，提升复杂分析任务的可靠性。",
       "payload": {
-        "lead": "Self-Consistency 的核心，不是让 AI 只给一个结论，而是让它沿着多条思路分别分析，再从多个候选结果中挑选最一致的答案。",
-        "blocks": [
+        "scenarioLabel": "Technique",
+        "scenario": "Self-Consistency / 多路径推理收敛",
+        "challengeLabel": "为什么这类方法在复杂排查里有效",
+        "challenge": [
+          "复杂 Bug 往往存在多个表面解释，单次回答很容易被最显眼的现象带偏。",
+          "关键不是生成更多答案，而是比较多个结论里哪些本质一致、能相互印证。",
+          "尤其适合算术、常识判断、疑难排查和多因子分析这类需要提高稳定性的任务。"
+        ],
+        "beforeLabel": "Prompt",
+        "beforePrompt": "请分析“工单完工后库存未增加”这个 Bug。\n分别给出至少 3 条可能原因，每条原因都要附结论。\n最后比较这些结论，选出最一致的主结论，并说明理由。",
+        "afterLabel": "AI 并发推理与决策",
+        "afterPrompt": "分析 1：完工页面可能没有刷新，所以看起来库存没增加。\n结论 1：前端显示问题\n\n分析 2：完工成功后，应该触发成品入库；如果入库接口没调用，库存不会增加。\n结论 2：完工后未触发入库逻辑\n\n分析 3：如果工单状态已完工，但库存表没有变化，说明业务状态更新了，但库存联动没执行。\n结论 3：完工与库存更新未完成联动\n\n决策说明：结论 2 和结论 3 本质一致，都指向后端联动逻辑执行问题。",
+        "outcomes": [
           {
-            "label": "推理方式",
-            "value": "多路径采样",
-            "description": "让模型从不同思路分别推理，而不是一次性给唯一解释。"
+            "label": "分析路径",
+            "value": "3 条"
           },
           {
-            "label": "决策方式",
-            "value": "收敛最一致答案",
-            "description": "对比多个结论，选择彼此最接近、最能相互印证的结果。"
+            "label": "主结论",
+            "value": "后端联动"
           },
           {
-            "label": "实战案例",
-            "value": "库存数据 Bug",
-            "description": "前端刷新、后端未联动入库、业务状态更新但库存未变，都需要并行比较。"
-          },
-          {
-            "label": "适用任务",
-            "value": "复杂排查与推理",
-            "description": "尤其适合算术、常识判断、Bug 定位和多因子分析。"
+            "label": "价值",
+            "value": "误判更少"
           }
         ],
-        "emphasis": {
-          "title": "核心判断",
-          "body": "一致性自检不是让 AI 更会说，而是让它少走错方向。多路径思考后再收敛，能显著提升复杂分析质量。"
-        },
-        "quote": "结论 2 和结论 3 本质一致，都指向：后端联动逻辑执行问题。"
+        "learningsLabel": "核心判断",
+        "learnings": [
+          "先并行列出多个候选解释，再判断哪些结论本质一致。",
+          "如果多条推理路径收敛到同一类根因，可信度明显高于单次直觉回答。",
+          "一致性自检的价值，不是让 AI 更会说，而是让它少走错方向。"
+        ]
       }
     },
     {
@@ -739,18 +808,33 @@
       "id": "art",
       "type": "flow",
       "eyebrow": "技术核心 10",
-      "title": "ART：让 AI 从只会说话，进化到会查库、会计算、会继续推理",
-      "subtitle": "Automatic Reasoning and Tool-use 的重点，是让模型在遇到弱项时主动调用外部工具。",
+      "title": "ART：让 AI 从“只会说话”变成“会查库、会计算、会继续推理”",
+      "subtitle": "Automatic Reasoning and Tool-use 的重点，不是让模型多说几句，而是让它在弱项处主动停下来调用工具。",
       "payload": {
-        "description": "当任务涉及实时数据或精确计算时，不能让 AI 凭空猜，应该规定工具集并允许它边推理边调用。",
-        "mermaid": "flowchart LR\n    A[任务: 排查 LOT-20260314 损耗率] --> B[Reason\\n先查数据库]\n    B --> C[Action\\nquery_database]\n    C --> D[Observation\\n1050 / 1000]\n    D --> E[Reason\\n需要精确计算]\n    E --> F[Action\\ncalculator]\n    F --> G[Observation\\n4.76%]\n    G --> H[Final Answer\\n损耗率超标]",
+        "description": "场景背景是产线反馈某个批次的物料消耗数据对不上。ART 的核心逻辑是：当 AI 遇到实时取数和精确计算这类弱项时，不要凭空猜，而是先调用工具拿结果，再继续推理。",
+        "promptPanel": {
+          "title": "提示词设计",
+          "instruction": "你是一个产线数据排查助手。当你需要获取实时数据或进行计算时，你可以输出特定指令来调用工具。",
+          "tools": [
+            {
+              "name": "[查询数据库]",
+              "detail": "传入 SQL 语句，返回查询结果。"
+            },
+            {
+              "name": "[精确计算器]",
+              "detail": "传入数学表达式，返回精确结果。"
+            }
+          ],
+          "task": "排查批次 \"LOT-20260314\" 的物料损耗率是否超标（标准 < 2%）。"
+        },
+        "mermaid": "flowchart TB\n    Task[\"任务\\n批次 LOT-20260314 损耗率是否超标\"]\n\n    subgraph Trace[\"AI 的推理与工具使用轨迹\"]\n      direction TB\n      R1[\"Reason 1\\n先查领料总数和实际产出消耗数\"] --> A1[\"Action 1\\n[查询数据库]\\nSELECT total_issue, actual_consume\\nFROM material_lot\\nWHERE lot_no = 'LOT-20260314'\"]\n      A1 --> O1[\"Observation 1\\n{total_issue: 1050, actual_consume: 1000}\"]\n      O1 --> R2[\"Reason 2\\n计算损耗率需要精确计算器\"]\n      R2 --> A2[\"Action 2\\n[精确计算器]\\n(1050 - 1000) / 1050\"]\n      A2 --> O2[\"Observation 2\\n0.0476 = 4.76%\"]\n      O2 --> Final[\"最终输出\\n损耗率 4.76%，已超过 2% 标准\"]\n    end\n\n    Task --> R1",
         "checkpoints": [
-          "工具集示例：查询数据库、精确计算器、实时 API、工作流执行器。",
-          "后端程序要检查模型响应是否为 tool_call，再分发执行工具并把结果喂回模型。",
-          "不要让 AI 凭空猜实时数据，高级用法是让它自己决定什么时候该查、什么时候该算。",
-          "ART 的价值是把推理和工具能力接起来，而不是只让模型生成一段解释文字。"
+          "这类任务的关键不是让 AI 直接判断，而是先取到真实数据，再做后续结论。",
+          "提示词里要先声明工具协议：允许模型在需要实时数据或精确计算时输出工具调用指令。",
+          "第一轮调用数据库拿到 total_issue = 1050、actual_consume = 1000；第二轮调用计算器算出损耗率 4.76%。",
+          "最后一步再把 4.76% 和 2% 阈值对比，得出“已超标异常”的业务结论。"
         ],
-        "takeaway": "不让 AI 猜数据，而是让 AI 学会在需要时暂停、取数、计算、再继续推理。"
+        "takeaway": "不要让 AI 凭空猜数据。高级的用法是：规定好工具集，让 AI 自己决定什么时候该去查库、什么时候该去调用 API。"
       }
     },
     {
@@ -821,9 +905,9 @@
         ],
         "emphasis": {
           "title": "核心价值",
-          "body": "不是替 AI 把所有活都干了，而是让 AI 告诉你它哪里不会，人只负责教最难的那部分。"
+          "body": "不是替 AI 把所有活都干了，而是让 AI 告诉你它哪里不会，人只负责教它最难的那部分。"
         },
-        "quote": "人工示例优先投给 AI 最容易出错的地方。"
+        "quote": "价值：人工投入更少，复杂场景覆盖更好，也更适合沉淀团队级模板。"
       }
     },
     {
@@ -874,15 +958,32 @@
       "title": "ReAct：让 AI 遵循 Thought -> Action -> Observation 的循环",
       "subtitle": "它是连接自然语言和系统操作的桥梁，也是 AI Agent 的重要基石。",
       "payload": {
-        "description": "传统模型只会思考然后回答；ReAct 则要求模型一边思考，一边调用工具，一边根据观察结果继续推进。",
-        "mermaid": "flowchart LR\n    A[告警: 生产库死锁] --> B[Thought 1\\n先查锁等待状态]\n    B --> C[Action 1\\nDB_Monitor_API]\n    C --> D[Observation 1\\nwork_order 与 inventory 循环等待]\n    D --> E[Thought 2\\n查最近半小时慢 SQL]\n    E --> F[Action 2\\nLog_Search_API]\n    F --> G[Observation 2\\n加锁顺序相反]\n    G --> H[Final Answer\\n统一加锁顺序]",
+        "description": "ReAct 真正落地时，不只是一句“让模型边想边做”，而是一条完整的 Agent 后端链路：请求进入 Controller，再由 AgentService 判断是否需要调工具，之后才进入 Tool Dispatcher 和外部系统。",
+        "mermaid": "flowchart LR\n    U[\"用户 / 告警输入\"] --> C1[\"Controller\"]\n    C1 --> C2[\"AgentService\\n判断当前是直接回答\\n还是要调工具\"]\n    C2 --> C3[\"LLM Client / 大模型\"]\n    C3 --> C4[\"Tool Dispatcher\"]\n    C4 --> C5[\"Database / API / Calculator / Workflow / MQ\"]\n    C5 -.结果返回.-> C2\n    C2 -.继续推理或组织结果.-> C3",
         "checkpoints": [
-          "任务示例：排查线上死锁，不是一次回答，而是逐步查状态、查日志、归因、给建议。",
-          "后端结构可拆成 Controller -> AgentService -> LLM Client -> Tool Dispatcher -> Database / API / Workflow。",
-          "ReAct 的本质，是让 AI 的“想”和“做”交替进行，而不是停留在纸面分析。",
-          "掌握它，就更容易理解未来的智能运维和自动化助手是怎么工作的。"
+          "用户问题先进入 Controller，不会直接飞到模型那里，AgentService 才是决定“直接回答还是调工具”的关键位置。",
+          "大模型负责产生 Thought 和 Action 意图，Tool Dispatcher 负责把意图翻译成真实的数据库、API、工作流或计算器调用。",
+          "工具返回结果后，后端再把 Observation 喂回模型，让它继续推理，而不是一次调用就结束。",
+          "ReAct 真正值钱的地方，是把自然语言推理和系统级操作接成闭环。"
         ],
-        "takeaway": "ReAct 是连接“自然语言”和“系统操作”的桥梁。"
+        "takeaway": "ReAct 是连接“自然语言”和“系统操作”的桥梁。掌握它，你就明白未来的自动化运维和智能助手是怎么工作的。"
+      }
+    },
+    {
+      "id": "react-execution-map",
+      "type": "flow",
+      "eyebrow": "技术核心 14 执行大图",
+      "title": "ReAct 执行循环大图：一张图看懂死锁告警如何一步步收敛",
+      "subtitle": "这页不再塞右侧说明，让流程图单独占满舞台，方便演讲时停留和讲解。",
+      "payload": {
+        "description": "贴近研发的真实案例是：MES 生产库报出死锁告警，AI 先查锁等待状态，再查慢 SQL，最后收敛到“加锁顺序不一致”这个根因，并输出修复建议。",
+        "mermaid": "flowchart TB\n    Task[\"任务: MES 生产库报出死锁告警\\n请排查原因\"] --> T1[\"Thought 1\\n先查当前被锁事务和涉及的表\"]\n    T1 --> A1[\"Action 1\\n调用 DB_Monitor_API\"]\n    A1 --> O1[\"Observation 1\\nwork_order 与 inventory 存在循环等待\"]\n    O1 --> T2[\"Thought 2\\n继续查最近半小时慢 SQL\"]\n    T2 --> A2[\"Action 2\\n调用 Log_Search_API\"]\n    A2 --> O2[\"Observation 2\\n两条高并发更新语句的加锁顺序相反\"]\n    O2 --> T3[\"Thought 3\\n根因明确, 输出修复建议\"]\n    T3 --> Final[\"最终输出\\n统一加锁顺序: 先工单表, 后库存表\"]",
+        "checkpoints": [
+          "第一轮先查锁等待状态，目标是确认到底是哪几张表和哪几类事务被卡住。",
+          "第二轮再查最近半小时慢 SQL，把“现象”推进到“根因”，而不是停留在死锁表象。",
+          "最后把根因翻译成修复建议，这才是 ReAct 里从 Observation 走向可执行结果的关键一步。"
+        ],
+        "takeaway": "ReAct 的价值不是多一个流程图，而是让 AI 真正具备“会查、会看、会继续推理”的闭环能力。"
       }
     },
     {
@@ -932,6 +1033,12 @@
       "eyebrow": "落地应用场景",
       "title": "前面讲的技术，最终都要回到两类真实价值：个人提效与团队提效",
       "subtitle": "CoT 解决怎么想清楚，RAG 解决怎么拿到对的上下文，ToT 解决怎么在多个方案里做更稳妥的决策。",
+      "media": {
+        "src": "/images/illustrations/delivery-loop.svg",
+        "alt": "Delivery loop illustration",
+        "caption": "个人提效和团队提效最终都会回到真实的研发交付闭环。",
+        "fit": "contain"
+      },
       "payload": {
         "lead": "Prompt Engineering 不应该停留在概念层。它要落在需求开发、上线评审、测试设计和风险排查这些团队每天都在做的工作里。",
         "blocks": [
@@ -1045,11 +1152,58 @@
       }
     },
     {
+      "id": "team-review-routes",
+      "type": "case-study",
+      "eyebrow": "场景 2 延伸",
+      "title": "团队提效延伸：把发布评审变成 A / B / C 三条上线方案对比",
+      "subtitle": "重点不是只给一个建议，而是让模型从风险、回滚复杂度、停机窗口和验证成本四维做结构化比较。",
+      "payload": {
+        "scenarioLabel": "Decision Matrix",
+        "scenario": "三条上线方案并行评估",
+        "challengeLabel": "决策维度",
+        "challenge": [
+          "方案 A：先上 SQL 再上服务，适合数据库先行，但兼容窗口更窄，失败面更集中。",
+          "方案 B：先上服务兼容旧表再切 SQL，切换更平滑，通常是多模块发布里更稳妥的常规方案。",
+          "方案 C：灰度发布 + 回滚开关，投入更高，但适合高影响、高风险、需要渐进验证的变更。"
+        ],
+        "beforeLabel": "评审 Prompt",
+        "beforePrompt": "你是发布评审助手。\n请根据本次变更文件（业务模块 + db 升级脚本）构建 3 条上线方案（A/B/C），\n对每条方案评估：失败概率、影响面、回滚步骤、验证清单，\n最后推荐方案并说明拒绝其他方案的理由。\n输出格式必须是对比表 + 最终建议 + 发布后观察指标。",
+        "afterLabel": "结构化输出",
+        "afterPrompt": "对比表：\n- 方案 A：风险高 / 回滚复杂度中 / 停机窗口高 / 验证成本中\n- 方案 B：风险中 / 回滚复杂度低 / 停机窗口低 / 验证成本中\n- 方案 C：风险最低 / 回滚复杂度低 / 停机窗口最低 / 验证成本高\n\n最终建议：推荐方案 B 或 C\n拒绝 A 的原因：跨模块发布时兼容窗口窄，失败影响面更大\n发布后观察指标：接口错误率、核心 SQL 延迟、回滚开关状态",
+        "outcomes": [
+          {
+            "label": "方案数",
+            "value": "3 条"
+          },
+          {
+            "label": "评估维度",
+            "value": "4 维"
+          },
+          {
+            "label": "输出形态",
+            "value": "对比表 + 建议"
+          }
+        ],
+        "learningsLabel": "收益",
+        "learnings": [
+          "发布评审要从经验型口头讨论，升级成可比较、可回滚、可复盘的决策过程。",
+          "让 AI 写出拒绝其他方案的理由，能显著减少评审会上拍脑袋。",
+          "这类结构特别适合继续固化进 PR 模板、上线清单和发布检查表。"
+        ]
+      }
+    },
+    {
       "id": "security-threats",
       "type": "three-column",
       "eyebrow": "安全护栏",
       "title": "当大模型深度接入业务系统，传统安全体系必须扩展到提示词层",
       "subtitle": "大模型会面临对抗性提示、提示泄漏与越狱攻击，不能把自然语言输入直接当可信数据。",
+      "media": {
+        "src": "/images/illustrations/security-gateway.svg",
+        "alt": "Security gateway illustration",
+        "caption": "模型调用前后都要有隔离层、检测层和审计层。",
+        "fit": "contain"
+      },
       "payload": {
         "intro": "防 SQL 注入和 XSS 只是开始。大模型应用还要面对“提示词注入、提示泄漏、深度越狱”这类新型对抗风险。",
         "columns": [
@@ -1125,8 +1279,8 @@
       "id": "summary-close",
       "type": "summary",
       "eyebrow": "总结",
-      "title": "这套分享最终服务的，不是“会不会用 AI”，而是团队如何稳定表达与稳定交付",
-      "subtitle": "从开篇定位、技术核心、场景落地到安全护栏，这套 deck 现在已经覆盖了完整讲稿主线。",
+      "title": "最终结论：AI 提效的关键，是把问题表达成 AI 可执行的任务",
+      "subtitle": "真正要沉淀的不是临时问法，而是团队级的表达标准、工作流模板和安全护栏。",
       "payload": {
         "pillars": [
           {
@@ -1147,11 +1301,11 @@
           }
         ],
         "nextSteps": [
-          "继续把剩余讲稿内容迭代成更细的 slide JSON 或按章节拆分 deck",
-          "为每类技术模板补充可切换的示例数据，支持 AI 自动生成更多演示稿",
-          "把个人提效与团队评审类 Prompt 固化为团队常用模板库"
+          "先从一个高频协作场景开始，把角色、背景、边界、输出格式沉淀成固定 Prompt 模板。",
+          "个人提效优先落地“先检索上下文，再分步输出改动计划”的工作流，而不是直接让 AI 一把梭写代码。",
+          "团队侧把发布评审、安全检测和回滚说明固化进流程，让 Prompt 真正进入交付链路。"
         ],
-        "closing": "Prompt Engineering 不是技巧堆砌，而是一套让 AI 更稳、更准、更可落地地服务团队协作与研发交付的方法论。"
+        "closing": "AI 提效的关键，不只是有没有工具，而是能不能把问题表达清楚。提示词工程的目标，就是把这种表达能力沉淀成团队级方法论。"
       }
     }
   ]

@@ -83,6 +83,64 @@ body::after {
   backdrop-filter: blur(12px);
 }
 
+.slide-motion-scope {
+  height: 100%;
+  width: 100%;
+}
+
+.slide-motion-item {
+  will-change: opacity, transform, filter;
+  backface-visibility: hidden;
+}
+
+.reveal .slides section:not(.present) .slide-motion-item {
+  opacity: 0;
+  transform: translate3d(var(--motion-from-x, 0px), var(--motion-from-y, 24px), 0)
+    scale(var(--motion-from-scale, 0.985));
+  filter: blur(var(--motion-blur, 12px));
+}
+
+.reveal .slides section.present .slide-motion-item {
+  animation-name: slide-motion-enter;
+  animation-duration: var(--motion-duration, 620ms);
+  animation-delay: calc(var(--motion-delay, 0ms) + var(--motion-order, 0ms));
+  animation-timing-function: var(--motion-ease, cubic-bezier(0.22, 1, 0.36, 1));
+  animation-fill-mode: both;
+}
+
+@keyframes slide-motion-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(var(--motion-from-x, 0px), var(--motion-from-y, 24px), 0)
+      scale(var(--motion-from-scale, 0.985));
+    filter: blur(var(--motion-blur, 12px));
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal .slides section .slide-motion-item {
+    opacity: 1 !important;
+    animation: none !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .presentation-shell,
+  .presentation-shell *,
+  .reveal,
+  .reveal * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+  }
+}
+
 .presentation-shell {
   position: relative;
   isolation: isolate;

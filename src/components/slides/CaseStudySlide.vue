@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, toRef } from 'vue';
 import SlideShell from '@/components/common/SlideShell.vue';
+import { useSlideMotion } from '@/composables/useSlideMotion';
 import type { CaseStudySlideDefinition } from '@/types/slide';
 
 const props = defineProps<{
@@ -9,6 +10,7 @@ const props = defineProps<{
 
 const layout = computed(() => props.slide.variant ?? 'compare');
 const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
+const { motion } = useSlideMotion(toRef(props, 'slide'));
 </script>
 
 <template>
@@ -18,7 +20,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
       class="grid h-full min-h-0 grid-rows-[auto_1fr_auto] gap-4"
     >
       <div class="grid grid-cols-[1.04fr_0.96fr] gap-4">
-        <div class="slide-stage px-6 py-5">
+        <div
+          class="slide-stage px-6 py-5"
+          v-bind="motion('panel')"
+        >
           <p class="slide-label mb-3 text-blue-700/80">
             {{ slide.payload.scenarioLabel ?? 'Scenario' }}
           </p>
@@ -29,9 +34,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
 
         <div class="grid grid-cols-3 gap-3.5">
           <div
-            v-for="outcome in slide.payload.outcomes"
+            v-for="(outcome, index) in slide.payload.outcomes"
             :key="outcome.label"
             class="slide-frost px-4 py-4"
+            v-bind="motion('metric', index)"
           >
             <p class="slide-label mb-2">
               {{ outcome.label }}
@@ -44,7 +50,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
       </div>
 
       <div class="grid min-h-0 grid-cols-[0.74fr_1.26fr] gap-4">
-        <div class="slide-rail-card flex min-h-0 flex-col pl-10 pr-5 py-4">
+        <div
+          class="slide-rail-card flex min-h-0 flex-col pl-10 pr-5 py-4"
+          v-bind="motion('rail')"
+        >
           <p class="slide-label mb-3">
             {{ slide.payload.challengeLabel ?? '为什么一开始不好用' }}
           </p>
@@ -60,7 +69,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
         </div>
 
         <div class="grid min-h-0 grid-cols-2 gap-4">
-          <article class="slide-stage fragment min-h-0 overflow-hidden p-0">
+          <article
+            class="slide-stage min-h-0 overflow-hidden p-0"
+            v-bind="motion('code', 0, { effect: 'glide-left' })"
+          >
             <div class="border-b border-slate-200/80 px-5 py-3.5">
               <p class="slide-label text-rose-600/80">
                 {{ slide.payload.beforeLabel ?? 'Before' }}
@@ -69,7 +81,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
             <pre class="h-full min-h-0 overflow-auto whitespace-pre-wrap break-words px-5 py-4 font-mono text-[13px] leading-5 text-slate-700"><code>{{ slide.payload.beforePrompt }}</code></pre>
           </article>
 
-          <article class="slide-stage fragment min-h-0 overflow-hidden p-0">
+          <article
+            class="slide-stage min-h-0 overflow-hidden p-0"
+            v-bind="motion('code', 1, { effect: 'glide-right' })"
+          >
             <div class="border-b border-slate-200/80 px-5 py-3.5">
               <p class="slide-label text-emerald-600/80">
                 {{ slide.payload.afterLabel ?? 'After' }}
@@ -84,7 +99,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
         class="grid gap-4"
         :class="examplePairs.length ? 'grid-cols-[0.9fr_1.1fr]' : 'grid-cols-1'"
       >
-        <div class="slide-quote-card px-5 py-4">
+        <div
+          class="slide-quote-card px-5 py-4"
+          v-bind="motion('quote')"
+        >
           <p class="slide-label relative mb-2 text-amber-700">
             {{ slide.payload.learningsLabel ?? 'Learnings' }}
           </p>
@@ -104,9 +122,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
           class="grid grid-cols-2 gap-3"
         >
           <article
-            v-for="pair in examplePairs"
+            v-for="(pair, index) in examplePairs"
             :key="pair.title"
             class="slide-frost px-4 py-4"
+            v-bind="motion('card', index)"
           >
             <p class="slide-label mb-3 text-blue-700/80">
               {{ pair.title }}
@@ -141,7 +160,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
       class="grid h-full min-h-0 grid-cols-[0.92fr_1.08fr] gap-5"
     >
       <div class="grid min-h-0 grid-rows-[auto_auto_1fr] gap-5">
-        <div class="slide-stage px-6 py-5">
+        <div
+          class="slide-stage px-6 py-5"
+          v-bind="motion('panel')"
+        >
           <p class="slide-label mb-3 text-blue-700/80">
             {{ slide.payload.scenarioLabel ?? 'Workflow' }}
           </p>
@@ -152,9 +174,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
 
         <div class="grid grid-cols-3 gap-3.5">
           <div
-            v-for="outcome in slide.payload.outcomes"
+            v-for="(outcome, index) in slide.payload.outcomes"
             :key="outcome.label"
             class="slide-frost px-4 py-4"
+            v-bind="motion('metric', index)"
           >
             <p class="slide-label mb-1.5">
               {{ outcome.label }}
@@ -165,7 +188,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
           </div>
         </div>
 
-        <div class="slide-rail-card flex min-h-0 flex-col pl-10 pr-5 py-5">
+        <div
+          class="slide-rail-card flex min-h-0 flex-col pl-10 pr-5 py-5"
+          v-bind="motion('rail')"
+        >
           <p class="slide-label mb-4">
             {{ slide.payload.challengeLabel ?? '关键约束' }}
           </p>
@@ -182,7 +208,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
       </div>
 
       <div class="grid min-h-0 grid-rows-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-4">
-        <article class="slide-stage fragment min-h-0 overflow-hidden p-0">
+        <article
+          class="slide-stage min-h-0 overflow-hidden p-0"
+          v-bind="motion('code', 0, { effect: 'glide-left' })"
+        >
           <div class="border-b border-slate-200/80 px-5 py-3.5">
             <p class="slide-label text-rose-600/80">
               {{ slide.payload.beforeLabel ?? 'Before' }}
@@ -191,7 +220,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
           <pre class="h-full min-h-0 overflow-auto whitespace-pre-wrap break-words px-5 py-4 font-mono text-[13px] leading-5 text-slate-700"><code>{{ slide.payload.beforePrompt }}</code></pre>
         </article>
 
-        <article class="slide-stage fragment min-h-0 overflow-hidden p-0">
+        <article
+          class="slide-stage min-h-0 overflow-hidden p-0"
+          v-bind="motion('code', 1, { effect: 'glide-right' })"
+        >
           <div class="border-b border-slate-200/80 px-5 py-3.5">
             <p class="slide-label text-emerald-600/80">
               {{ slide.payload.afterLabel ?? 'After' }}
@@ -200,7 +232,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
           <pre class="h-full min-h-0 overflow-auto whitespace-pre-wrap break-words px-5 py-4 font-mono text-[13px] leading-5 text-slate-800"><code>{{ slide.payload.afterPrompt }}</code></pre>
         </article>
 
-        <div class="slide-frost px-5 py-4">
+        <div
+          class="slide-frost px-5 py-4"
+          v-bind="motion('quote')"
+        >
           <p class="slide-label mb-2 text-blue-700/80">
             {{ slide.payload.learningsLabel ?? 'Learnings' }}
           </p>
@@ -222,7 +257,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
       class="grid h-full min-h-0 grid-cols-[1.04fr_0.96fr] gap-5"
     >
       <div class="grid min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] gap-4">
-        <div class="slide-stage px-6 py-5">
+        <div
+          class="slide-stage px-6 py-5"
+          v-bind="motion('panel')"
+        >
           <p class="slide-label mb-3 text-blue-700/80">
             {{ slide.payload.scenarioLabel ?? 'Case File' }}
           </p>
@@ -231,7 +269,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
           </h3>
         </div>
 
-        <article class="slide-stage fragment min-h-0 overflow-hidden p-0">
+        <article
+          class="slide-stage min-h-0 overflow-hidden p-0"
+          v-bind="motion('code', 0, { effect: 'glide-left' })"
+        >
           <div class="border-b border-slate-200/80 px-5 py-3.5">
             <p class="slide-label text-rose-600/80">
               {{ slide.payload.beforeLabel ?? 'Prompt' }}
@@ -242,9 +283,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
 
         <div class="grid grid-cols-3 gap-3.5">
           <div
-            v-for="outcome in slide.payload.outcomes"
+            v-for="(outcome, index) in slide.payload.outcomes"
             :key="outcome.label"
             class="slide-frost px-4 py-4"
+            v-bind="motion('metric', index)"
           >
             <p class="slide-label mb-1.5">
               {{ outcome.label }}
@@ -257,7 +299,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
       </div>
 
       <div class="grid min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] gap-4">
-        <div class="slide-rail-card pl-10 pr-5 py-5">
+        <div
+          class="slide-rail-card pl-10 pr-5 py-5"
+          v-bind="motion('rail')"
+        >
           <p class="slide-label mb-4">
             {{ slide.payload.challengeLabel ?? 'Why It Matters' }}
           </p>
@@ -272,7 +317,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
           </ul>
         </div>
 
-        <article class="slide-stage fragment min-h-0 overflow-hidden p-0">
+        <article
+          class="slide-stage min-h-0 overflow-hidden p-0"
+          v-bind="motion('code', 1, { effect: 'glide-right' })"
+        >
           <div class="border-b border-slate-200/80 px-5 py-3.5">
             <p class="slide-label text-emerald-600/80">
               {{ slide.payload.afterLabel ?? 'Output' }}
@@ -281,7 +329,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
           <pre class="h-full min-h-0 overflow-auto whitespace-pre-wrap break-words px-5 py-4 font-mono text-[13px] leading-5 text-slate-800"><code>{{ slide.payload.afterPrompt }}</code></pre>
         </article>
 
-        <div class="slide-quote-card px-5 py-4">
+        <div
+          class="slide-quote-card px-5 py-4"
+          v-bind="motion('quote')"
+        >
           <p class="slide-label relative mb-2 text-amber-700">
             {{ slide.payload.learningsLabel ?? 'Decision Notes' }}
           </p>
@@ -303,7 +354,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
       class="grid h-full min-h-0 grid-cols-[1.06fr_0.94fr] gap-5"
     >
       <div class="grid min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-5">
-        <div class="slide-stage px-6 py-5">
+        <div
+          class="slide-stage px-6 py-5"
+          v-bind="motion('panel')"
+        >
           <div class="mb-5 flex items-start justify-between gap-4">
             <div>
               <p class="slide-label mb-2 text-blue-700/80">
@@ -317,9 +371,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
 
           <div class="grid grid-cols-3 gap-3.5">
             <div
-              v-for="outcome in slide.payload.outcomes"
+              v-for="(outcome, index) in slide.payload.outcomes"
               :key="outcome.label"
               class="slide-frost px-4 py-4"
+              v-bind="motion('metric', index)"
             >
               <p class="slide-label mb-1.5">
                 {{ outcome.label }}
@@ -332,7 +387,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
         </div>
 
         <div class="grid min-h-0 grid-cols-2 gap-4">
-          <article class="slide-stage fragment min-h-0 overflow-hidden p-0">
+          <article
+            class="slide-stage min-h-0 overflow-hidden p-0"
+            v-bind="motion('code', 0, { effect: 'glide-left' })"
+          >
             <div class="border-b border-slate-200/80 px-5 py-3.5">
               <p class="slide-label text-rose-600/80">
                 {{ slide.payload.beforeLabel ?? 'Before' }}
@@ -341,7 +399,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
             <pre class="h-full min-h-0 overflow-auto whitespace-pre-wrap break-words px-5 py-4 font-mono text-[13px] leading-5 text-slate-700"><code>{{ slide.payload.beforePrompt }}</code></pre>
           </article>
 
-          <article class="slide-stage fragment min-h-0 overflow-hidden p-0">
+          <article
+            class="slide-stage min-h-0 overflow-hidden p-0"
+            v-bind="motion('code', 1, { effect: 'glide-right' })"
+          >
             <div class="border-b border-slate-200/80 px-5 py-3.5">
               <p class="slide-label text-emerald-600/80">
                 {{ slide.payload.afterLabel ?? 'After' }}
@@ -353,7 +414,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
       </div>
 
       <div class="grid min-h-0 grid-rows-[minmax(0,1fr)_auto] gap-4">
-        <div class="slide-rail-card flex min-h-0 flex-col pl-10 pr-5 py-5">
+        <div
+          class="slide-rail-card flex min-h-0 flex-col pl-10 pr-5 py-5"
+          v-bind="motion('rail')"
+        >
           <p class="slide-label mb-4">
             {{ slide.payload.challengeLabel ?? '为什么一开始不好用' }}
           </p>
@@ -368,7 +432,10 @@ const examplePairs = computed(() => props.slide.payload.examplePairs ?? []);
           </ul>
         </div>
 
-        <div class="slide-quote-card px-5 py-4">
+        <div
+          class="slide-quote-card px-5 py-4"
+          v-bind="motion('quote')"
+        >
           <p class="slide-label relative mb-2 text-amber-700">
             {{ slide.payload.learningsLabel ?? 'Learnings' }}
           </p>

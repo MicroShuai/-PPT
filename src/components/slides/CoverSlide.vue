@@ -1,10 +1,15 @@
 <script setup lang="ts">
+import { toRef } from 'vue';
+import SlideMediaPanel from '@/components/common/SlideMediaPanel.vue';
 import SlideShell from '@/components/common/SlideShell.vue';
+import { useSlideMotion } from '@/composables/useSlideMotion';
 import type { CoverSlideDefinition } from '@/types/slide';
 
-defineProps<{
+const props = defineProps<{
   slide: CoverSlideDefinition;
 }>();
+
+const { motion } = useSlideMotion(toRef(props, 'slide'));
 </script>
 
 <template>
@@ -18,7 +23,10 @@ defineProps<{
             Session Thesis
           </span>
 
-          <div class="max-w-4xl space-y-5">
+          <div
+            class="max-w-4xl space-y-5"
+            v-bind="motion('lead')"
+          >
             <p class="text-[42px] font-semibold leading-[1.3] text-slate-900">
               {{ slide.payload.headline }}
             </p>
@@ -30,17 +38,29 @@ defineProps<{
 
         <div class="flex flex-wrap gap-3">
           <span
-            v-for="item in slide.payload.highlights"
+            v-for="(item, index) in slide.payload.highlights"
             :key="item"
             class="rounded-full border border-blue-200/90 bg-white/75 px-5 py-3 text-base font-medium tracking-[0.03em] text-blue-700 shadow-sm"
+            v-bind="motion('chip', index)"
           >
             {{ item }}
           </span>
         </div>
       </div>
 
-      <div class="grid min-h-0 grid-rows-[auto_1fr_auto] gap-5">
-        <div class="slide-frost px-6 py-4 text-left">
+      <div class="grid min-h-0 grid-rows-[minmax(0,1fr)_auto_auto] gap-4">
+        <SlideMediaPanel
+          v-if="slide.media"
+          :media="slide.media"
+          compact
+          v-bind="motion('media')"
+        />
+
+        <div
+          v-else
+          class="slide-frost px-6 py-4 text-left"
+          v-bind="motion('media')"
+        >
           <p class="slide-label mb-2 text-blue-700/80">
             Presentation Snapshot
           </p>
@@ -49,27 +69,31 @@ defineProps<{
           </p>
         </div>
 
-        <div class="grid gap-4">
+        <div class="grid grid-cols-3 gap-3">
           <div
-            v-for="metric in slide.payload.metrics"
+            v-for="(metric, index) in slide.payload.metrics"
             :key="metric.label"
-            class="slide-stage flex items-end justify-between px-5 py-5 text-left"
+            class="slide-stage flex items-end justify-between px-4 py-4 text-left"
+            v-bind="motion('metric', index)"
           >
             <div>
-              <p class="slide-label mb-2">
+              <p class="slide-label mb-1.5">
                 {{ metric.label }}
               </p>
-              <p class="text-[28px] font-semibold text-slate-900">
+              <p class="text-[24px] font-semibold text-slate-900">
                 {{ metric.value }}
               </p>
             </div>
-            <div class="flex h-12 w-12 items-center justify-center rounded-[18px] border border-blue-200/80 bg-blue-50/90">
-              <div class="h-5 w-5 rounded-full bg-blue-300/80" />
+            <div class="flex h-10 w-10 items-center justify-center rounded-[16px] border border-blue-200/80 bg-blue-50/90">
+              <div class="h-4 w-4 rounded-full bg-blue-300/80" />
             </div>
           </div>
         </div>
 
-        <div class="slide-quote-card px-6 py-5 text-left">
+        <div
+          class="slide-quote-card px-6 py-5 text-left"
+          v-bind="motion('quote')"
+        >
           <div class="relative flex items-end justify-between gap-6">
             <div>
               <p class="slide-label mb-2 text-amber-700">
