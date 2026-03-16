@@ -11,6 +11,7 @@ const props = defineProps<{
 
 const diagramRef = ref<HTMLDivElement | null>(null);
 const layout = computed(() => props.slide.variant ?? 'route');
+const isArtSlide = computed(() => props.slide.id === 'art');
 const { motion } = useSlideMotion(toRef(props, 'slide'));
 
 const rootLayoutClass = computed(() => {
@@ -56,6 +57,17 @@ async function renderDiagram(): Promise<void> {
 
   try {
     await renderMermaid(diagramRef.value, `${props.slide.id}-diagram`, props.slide.payload.mermaid);
+
+    if (props.slide.id === 'art') {
+      const svg = diagramRef.value.querySelector('svg');
+
+      if (svg) {
+        svg.style.maxWidth = 'none';
+        svg.style.width = '100%';
+        svg.style.height = '100%';
+        svg.style.display = 'block';
+      }
+    }
   } catch (error) {
     console.error('Failed to render mermaid diagram', error);
     diagramRef.value.textContent = 'Mermaid 图渲染失败，请检查流程定义。';
@@ -132,6 +144,88 @@ watch(
             {{ item }}
           </p>
         </article>
+      </div>
+    </div>
+
+    <div
+      v-else-if="isArtSlide"
+      class="grid h-full min-h-0 min-w-0 grid-cols-[0.9fr_1.1fr] gap-5"
+    >
+      <div class="grid min-h-0 min-w-0 grid-rows-[auto_minmax(0,1fr)_auto] gap-4">
+        <div
+          class="slide-stage px-6 py-5"
+          v-bind="motion('panel')"
+        >
+          <p class="slide-label mb-3 text-blue-700/80">
+            {{ diagramLabel }}
+          </p>
+          <p class="text-base leading-7 text-slate-700">
+            {{ slide.payload.description }}
+          </p>
+        </div>
+
+        <div
+          v-if="slide.payload.promptPanel"
+          class="slide-rail-card min-h-0 px-6 py-5"
+          v-bind="motion('rail')"
+        >
+          <p class="slide-label mb-3 text-blue-700/80">
+            {{ slide.payload.promptPanel.title }}
+          </p>
+
+          <div class="space-y-4 text-slate-700">
+            <p class="text-[15px] leading-6">
+              {{ slide.payload.promptPanel.instruction }}
+            </p>
+
+            <div class="grid gap-3 sm:grid-cols-2">
+              <article
+                v-for="(tool, index) in slide.payload.promptPanel.tools"
+                :key="tool.name"
+                class="rounded-[22px] border border-slate-200/80 bg-white/70 px-4 py-3"
+                v-bind="motion('card', index)"
+              >
+                <p class="text-sm font-semibold text-slate-900">
+                  {{ tool.name }}
+                </p>
+                <p class="mt-1 text-[13px] leading-5 text-slate-600">
+                  {{ tool.detail }}
+                </p>
+              </article>
+            </div>
+
+            <div class="rounded-[22px] border border-amber-200/80 bg-amber-50/80 px-4 py-3">
+              <p class="slide-label mb-1 text-amber-700">
+                Task
+              </p>
+              <p class="text-[15px] font-medium leading-6 text-amber-900">
+                {{ slide.payload.promptPanel.task }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="slide-quote-card px-6 py-5"
+          v-bind="motion('quote')"
+        >
+          <p class="slide-label relative mb-3 text-amber-700">
+            分享金句
+          </p>
+          <p class="relative text-base font-medium leading-7 text-amber-900">
+            {{ slide.payload.takeaway }}
+          </p>
+        </div>
+      </div>
+
+      <div
+        class="slide-stage min-h-0 min-w-0 overflow-hidden p-5"
+        v-bind="motion('diagram')"
+      >
+        <div
+          ref="diagramRef"
+          class="h-full w-full min-w-0 overflow-hidden [&>svg]:h-full [&>svg]:w-full [&>svg]:max-w-full"
+        />
       </div>
     </div>
 

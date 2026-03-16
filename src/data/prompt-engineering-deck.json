@@ -585,7 +585,7 @@
       "id": "meta-prompting",
       "type": "case-study",
       "eyebrow": "技术核心 04",
-      "title": "元提示：不是只让 AI 写代码，而是要求它按可交付结构输出",
+      "title": "元提示：不是只让 AI 写代码，而是要求它“结构化输出”",
       "subtitle": "普通提示只是让 AI“做内容”；Meta Prompting 则要求它“按工程交付规范组织内容”。",
       "payload": {
         "scenarioLabel": "Technique",
@@ -614,11 +614,9 @@
             "value": "更接近工程产物"
           }
         ],
-        "learningsLabel": "实战认识",
+        "learningsLabel": "核心评价",
         "learnings": [
-          "元提示适合对输出结构有强要求的研发任务。",
-          "它能显著降低“内容有了，但没法直接用”的情况。",
-          "团队越强调规范化交付，元提示的价值越高。"
+          "这样生成的结果更像真正能落地的研发产物，比如先输出 DTO、再输出 Controller、再输出 Service、再输出 SQL。"
         ]
       }
     },
@@ -626,7 +624,7 @@
       "id": "self-consistency",
       "type": "case-study",
       "eyebrow": "技术核心 05",
-      "title": "一致性自检：不是只想一次，而是从多条推理路径里选择最一致的答案",
+      "title": "一致性自检：不是只思考一次，而是从多条路径推理后，选择最一致的答案",
       "subtitle": "它通过多路径思考和结果收敛，提升复杂分析任务的可靠性。",
       "payload": {
         "scenarioLabel": "Technique",
@@ -827,7 +825,7 @@
           ],
           "task": "排查批次 \"LOT-20260314\" 的物料损耗率是否超标（标准 < 2%）。"
         },
-        "mermaid": "flowchart TB\n    Task[\"任务\\n批次 LOT-20260314 损耗率是否超标\"]\n\n    subgraph Trace[\"AI 的推理与工具使用轨迹\"]\n      direction TB\n      R1[\"Reason 1\\n先查领料总数和实际产出消耗数\"] --> A1[\"Action 1\\n[查询数据库]\\nSELECT total_issue, actual_consume\\nFROM material_lot\\nWHERE lot_no = 'LOT-20260314'\"]\n      A1 --> O1[\"Observation 1\\n{total_issue: 1050, actual_consume: 1000}\"]\n      O1 --> R2[\"Reason 2\\n计算损耗率需要精确计算器\"]\n      R2 --> A2[\"Action 2\\n[精确计算器]\\n(1050 - 1000) / 1050\"]\n      A2 --> O2[\"Observation 2\\n0.0476 = 4.76%\"]\n      O2 --> Final[\"最终输出\\n损耗率 4.76%，已超过 2% 标准\"]\n    end\n\n    Task --> R1",
+        "mermaid": "flowchart LR\n    Task[\"任务\\n是否超标\"] --> Step1[\"查库\\n1050 / 1000\"] --> Step2[\"计算\\n4.76%\"] --> Final[\"结论\\n已超标\"]",
         "checkpoints": [
           "这类任务的关键不是让 AI 直接判断，而是先取到真实数据，再做后续结论。",
           "提示词里要先声明工具协议：允许模型在需要实时数据或精确计算时输出工具调用指令。",
@@ -880,34 +878,43 @@
     },
     {
       "id": "active-prompt",
-      "type": "concept",
+      "type": "case-study",
       "eyebrow": "技术核心 12",
       "title": "Active-Prompt：不是盲目给示例，而是把人工示例投给 AI 最容易出错的地方",
-      "subtitle": "人工投入不需要平均分配，而要优先用在高不确定、高分歧的难点样本上。",
+      "subtitle": "先让模型暴露不确定性，再把人工示例精准投给高难样本，最后按同一标准扩散生成。",
       "payload": {
-        "lead": "在 Few-shot 里，示例并不是越多越好。Active-Prompt 的思想是先让 AI 暴露不确定性，再让专家针对这些最难点补示例。",
-        "blocks": [
+        "scenarioLabel": "Technique",
+        "scenario": "测试用例批量自动生成",
+        "challengeLabel": "为什么普通 Few-shot 不够",
+        "challenge": [
+          "只给几个简单测试用例，AI 虽然能批量生成很多内容，但往往覆盖不到复杂边缘场景。",
+          "真正缺的不是示例数量，而是高难样本的标准答案。",
+          "Active-Prompt 的价值，是让人工标注优先投给最不确定、最容易漏判的地方。"
+        ],
+        "beforeLabel": "阶段 1：让 AI 暴露不确定性",
+        "beforePrompt": "先让 AI 找出最难建模的 3 个业务对象。\n要求：\n1. 说明每个对象为什么难。\n2. 指出最容易漏掉的边界场景。\n3. 按“对象 / 难点 / 风险”表格输出。",
+        "afterLabel": "阶段 2 + 3：人工补样本后再扩散",
+        "afterPrompt": "阶段 2：\n由资深开发补这 3 个对象的标准设计方案 / 标准测试用例。\n\n阶段 3：\n再让 AI 按同样标准生成其他测试用例。\n要求：\n1. 覆盖正常流、异常流、边界值。\n2. 输出格式必须与人工示例一致。\n3. 不要漏掉 Corner Cases。",
+        "outcomes": [
           {
-            "label": "阶段 1",
-            "value": "暴露不确定性",
-            "description": "先让 AI 找出最难建模、分歧最大、最容易出错的业务对象。"
+            "label": "人工投入",
+            "value": "更少"
           },
           {
-            "label": "阶段 2",
-            "value": "人工定向标注",
-            "description": "由资深开发或业务专家只补最关键、最复杂的标准答案。"
+            "label": "复杂场景覆盖",
+            "value": "更好"
           },
           {
-            "label": "阶段 3",
-            "value": "批量生成扩散",
-            "description": "再让 AI 按同样标准生成其他结构和内容，减少全面人工介入。"
+            "label": "团队沉淀",
+            "value": "更适合模板化"
           }
         ],
-        "emphasis": {
-          "title": "核心价值",
-          "body": "不是替 AI 把所有活都干了，而是让 AI 告诉你它哪里不会，人只负责教它最难的那部分。"
-        },
-        "quote": "价值：人工投入更少，复杂场景覆盖更好，也更适合沉淀团队级模板。"
+        "learningsLabel": "分享金句",
+        "learnings": [
+          "不是替 AI 把所有活都干了，而是让 AI 先暴露不会的点。",
+          "人只负责教最难的那部分，剩下的再交给 AI 扩散生成。",
+          "Active-Prompt 特别适合测试用例、复杂表结构和高难规则场景。"
+        ]
       }
     },
     {
