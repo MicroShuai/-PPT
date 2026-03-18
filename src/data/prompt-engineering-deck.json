@@ -962,35 +962,49 @@
       "id": "react",
       "type": "flow",
       "eyebrow": "技术核心 14",
-      "title": "ReAct：让 AI 遵循 Thought -> Action -> Observation 的循环",
-      "subtitle": "它是连接自然语言和系统操作的桥梁，也是 AI Agent 的重要基石。",
+      "title": "ReAct：让 AI 在 Thought -> Action -> Observation 循环里一步步查清死锁根因",
+      "subtitle": "传统模型只会“想完就给结论”，ReAct 则要求它边推理、边调工具、边根据 Observation 继续收敛。",
       "payload": {
-        "description": "ReAct 真正落地时，不只是一句“让模型边想边做”，而是一条完整的 Agent 后端链路：请求进入 Controller，再由 AgentService 判断是否需要调工具，之后才进入 Tool Dispatcher 和外部系统。",
-        "mermaid": "flowchart LR\n    U[\"用户 / 告警输入\"] --> C1[\"Controller\"]\n    C1 --> C2[\"AgentService\\n判断当前是直接回答\\n还是要调工具\"]\n    C2 --> C3[\"LLM Client / 大模型\"]\n    C3 --> C4[\"Tool Dispatcher\"]\n    C4 --> C5[\"Database / API / Calculator / Workflow / MQ\"]\n    C5 -.结果返回.-> C2\n    C2 -.继续推理或组织结果.-> C3",
-        "checkpoints": [
-          "用户问题先进入 Controller，不会直接飞到模型那里，AgentService 才是决定“直接回答还是调工具”的关键位置。",
-          "大模型负责产生 Thought 和 Action 意图，Tool Dispatcher 负责把意图翻译成真实的数据库、API、工作流或计算器调用。",
-          "工具返回结果后，后端再把 Observation 喂回模型，让它继续推理，而不是一次调用就结束。",
-          "ReAct 真正值钱的地方，是把自然语言推理和系统级操作接成闭环。"
-        ],
+        "description": "ReAct 的本质不是多一个流程图，而是让 AI 具备“手脑并用”的闭环能力。这也是构建 AI Agent 的基石。",
+        "storyboard": {
+          "conceptTitle": "概念定位",
+          "conceptBody": "赋予 AI “手脑并用”的能力。这是构建 AI Agent 的基石。",
+          "logicTitle": "核心逻辑",
+          "logicBody": "传统的 AI 只能先想再直接给结论；ReAct 强制它遵循 Thought -> Action -> Observation 的循环，不断调用工具并根据返回结果继续推理，直到问题被真正解决。",
+          "task": "任务：MES 生产库报出死锁告警，请排查原因。",
+          "steps": [
+            {
+              "label": "Round 1",
+              "thought": "既然有死锁告警，我需要先查一下数据库当前被锁的事务和涉及的表。",
+              "action": "调用工具 [DB_Monitor_API] 查询最新的锁等待状态。",
+              "observation": "返回结果显示 work_order 表和 inventory 表存在循环等待。"
+            },
+            {
+              "label": "Round 2",
+              "thought": "这两张表涉及工单和库存，我需要看看最近半小时有哪些慢 SQL 操作了这两张表。",
+              "action": "调用工具 [Log_Search_API] 查询相关慢 SQL。",
+              "observation": "找到了两个并发极高的更新语句，它们的加锁顺序相反。"
+            },
+            {
+              "label": "Round 3",
+              "thought": "根因已明确，加锁顺序不一致导致死锁。我需要输出修复建议。"
+            }
+          ],
+          "finalOutput": "发现死锁原因为业务 A 和业务 B 对 work_order 和 inventory 的加锁顺序相反。建议开发团队统一加锁顺序，先锁工单表，再锁库存表。"
+        },
         "takeaway": "ReAct 是连接“自然语言”和“系统操作”的桥梁。掌握它，你就明白未来的自动化运维和智能助手是怎么工作的。"
       }
     },
     {
       "id": "react-execution-map",
       "type": "flow",
-      "eyebrow": "技术核心 14 执行大图",
-      "title": "ReAct 执行循环大图：一张图看懂死锁告警如何一步步收敛",
-      "subtitle": "这页不再塞右侧说明，让流程图单独占满舞台，方便演讲时停留和讲解。",
+      "eyebrow": "技术核心 14 流程图",
+      "title": "ReAct 执行流程图：把死锁告警一步步推进到可执行修复建议",
+      "subtitle": "这一页只保留执行大图，让你在演讲时停下来讲清楚每一轮 Thought、Action 和 Observation。",
       "payload": {
-        "description": "贴近研发的真实案例是：MES 生产库报出死锁告警，AI 先查锁等待状态，再查慢 SQL，最后收敛到“加锁顺序不一致”这个根因，并输出修复建议。",
-        "mermaid": "flowchart TB\n    Task[\"任务: MES 生产库报出死锁告警\\n请排查原因\"] --> T1[\"Thought 1\\n先查当前被锁事务和涉及的表\"]\n    T1 --> A1[\"Action 1\\n调用 DB_Monitor_API\"]\n    A1 --> O1[\"Observation 1\\nwork_order 与 inventory 存在循环等待\"]\n    O1 --> T2[\"Thought 2\\n继续查最近半小时慢 SQL\"]\n    T2 --> A2[\"Action 2\\n调用 Log_Search_API\"]\n    A2 --> O2[\"Observation 2\\n两条高并发更新语句的加锁顺序相反\"]\n    O2 --> T3[\"Thought 3\\n根因明确, 输出修复建议\"]\n    T3 --> Final[\"最终输出\\n统一加锁顺序: 先工单表, 后库存表\"]",
-        "checkpoints": [
-          "第一轮先查锁等待状态，目标是确认到底是哪几张表和哪几类事务被卡住。",
-          "第二轮再查最近半小时慢 SQL，把“现象”推进到“根因”，而不是停留在死锁表象。",
-          "最后把根因翻译成修复建议，这才是 ReAct 里从 Observation 走向可执行结果的关键一步。"
-        ],
-        "takeaway": "ReAct 的价值不是多一个流程图，而是让 AI 真正具备“会查、会看、会继续推理”的闭环能力。"
+        "description": "从死锁告警开始，AI 先查锁等待状态，再查相关慢 SQL，最后把根因翻译成统一加锁顺序的修复建议。",
+        "mermaid": "flowchart LR\n    Task[\"任务\\nMES 生产库报出死锁告警\"] --> Step1[\"Round 1\\nThought: 查锁等待状态和涉及表\\nAction: 调用 DB_Monitor_API\\nObservation: work_order 与 inventory 循环等待\"] --> Step2[\"Round 2\\nThought: 查最近半小时慢 SQL\\nAction: 调用 Log_Search_API\\nObservation: 两条高并发更新语句加锁顺序相反\"] --> Step3[\"Round 3\\nThought: 根因已明确，输出修复建议\"] --> Final[\"最终输出\\n统一加锁顺序：先工单表，再库存表\"]",
+        "takeaway": "不要把 ReAct 理解成“会调工具”这么简单，它真正关键的是每次 Observation 都会反过来驱动下一轮推理。"
       }
     },
     {
@@ -1313,6 +1327,18 @@
           "团队侧把发布评审、安全检测和回滚说明固化进流程，让 Prompt 真正进入交付链路。"
         ],
         "closing": "AI 提效的关键，不只是有没有工具，而是能不能把问题表达清楚。提示词工程的目标，就是把这种表达能力沉淀成团队级方法论。"
+      }
+    },
+    {
+      "id": "chapter-outline",
+      "type": "flow",
+      "hideHeader": true,
+      "fullBleed": true,
+      "title": "章节总览",
+      "payload": {
+        "mermaid": "flowchart LR\n    Root[\"提示词工程与 AI 提效分享\"] --> Intro[\"开篇定位\"]\n    Root --> Pain[\"痛点与能力边界\"]\n    Root --> Mindset[\"提示词工程价值与心法\"]\n    Root --> Tech[\"15 类 Prompt 技术\"]\n    Root --> Apply[\"研发落地场景\"]\n    Root --> Security[\"安全护栏\"]\n    Intro --> Intro1[\"为什么要讲\"]\n    Intro --> Intro2[\"适用协作场景\"]\n    Pain --> Pain1[\"三类低效\"]\n    Pain --> Pain2[\"AI 真正擅长什么\"]\n    Pain --> Pain3[\"为什么有人觉得一般\"]\n    Mindset --> Mind1[\"结构化表达\"]\n    Mindset --> Mind2[\"Absolute Mode\"]\n    Tech --> Tech1[\"Zero-shot / Few-shot / CoT\"]\n    Tech --> Tech2[\"Meta / Self-Consistency / Generated Knowledge\"]\n    Tech --> Tech3[\"Prompt Chaining / ToT / RAG\"]\n    Tech --> Tech4[\"ART / APE / Active-Prompt\"]\n    Tech --> Tech5[\"Directional Stimulus / ReAct / Reflexion\"]\n    Apply --> Apply1[\"个人提效\"]\n    Apply --> Apply2[\"团队评审\"]\n    Security --> Security1[\"威胁建模\"]\n    Security --> Security2[\"纵深防御\"]",
+        "description": "",
+        "takeaway": ""
       }
     }
   ]

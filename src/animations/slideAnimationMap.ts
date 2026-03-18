@@ -248,6 +248,16 @@ export const slideAnimationMap: SlideAnimationMap = {
           quote: step('focus', 700, { duration: 520, distanceY: 10, blur: 7 })
         }
       },
+      storyboard: {
+        id: 'flow-storyboard',
+        slots: {
+          panel: step('rise', 240, { duration: 540, distanceY: 16 }),
+          rail: step('focus', 320, { duration: 620, distanceY: 14, scaleFrom: 0.978, blur: 8 }),
+          card: step('rise', 430, { stagger: 70, duration: 500, distanceY: 16, blur: 7 }),
+          quote: step('focus', 650, { duration: 560, distanceY: 10, scaleFrom: 0.978, blur: 8 }),
+          footer: step('rise', 720, { duration: 420, distanceY: 8, blur: 5 })
+        }
+      },
       canvas: {
         id: 'flow-canvas',
         slots: {
@@ -261,6 +271,20 @@ export const slideAnimationMap: SlideAnimationMap = {
           }),
           checkpoint: step('rise', 560, { stagger: 55, duration: 460, distanceY: 10, blur: 6 }),
           quote: step('focus', 470, { duration: 520, distanceY: 10, blur: 6, scaleFrom: 0.98 })
+        }
+      },
+      'diagram-only': {
+        id: 'flow-diagram-only',
+        slots: {
+          panel: step('rise', 230, { duration: 500, distanceY: 12, blur: 7 }),
+          diagram: step('focus', 300, {
+            duration: 940,
+            distanceY: 10,
+            scaleFrom: 0.98,
+            blur: 4,
+            easing: EASE_SOFT
+          }),
+          quote: step('rise', 620, { duration: 420, distanceY: 8, blur: 5 })
         }
       }
     }

@@ -26,8 +26,9 @@ const slideVariantMap: Record<string, string> = {
   'team-review-routes': 'dossier',
   'prompt-chaining': 'route',
   'art': 'control',
-  'react': 'runtime',
-  'react-execution-map': 'canvas',
+  'react': 'storyboard',
+  'react-execution-map': 'diagram-only',
+  'chapter-outline': 'diagram-only',
   'summary-close': 'closing'
 };
 

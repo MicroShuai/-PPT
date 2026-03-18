@@ -31,6 +31,8 @@ export interface BaseSlideDefinition<T extends SlideType, P> {
   id: string;
   type: T;
   variant?: string;
+  hideHeader?: boolean;
+  fullBleed?: boolean;
   eyebrow?: string;
   title: string;
   subtitle?: string;
@@ -120,8 +122,8 @@ export interface CaseStudySlidePayload {
 
 export interface FlowSlidePayload {
   description: string;
-  mermaid: string;
-  checkpoints: string[];
+  mermaid?: string;
+  checkpoints?: string[];
   takeaway: string;
   promptPanel?: {
     title: string;
@@ -131,6 +133,20 @@ export interface FlowSlidePayload {
       detail: string;
     }>;
     task: string;
+  };
+  storyboard?: {
+    conceptTitle: string;
+    conceptBody: string;
+    logicTitle: string;
+    logicBody: string;
+    task: string;
+    steps: Array<{
+      label: string;
+      thought: string;
+      action?: string;
+      observation?: string;
+    }>;
+    finalOutput: string;
   };
 }
 
