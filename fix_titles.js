@@ -44,8 +44,8 @@ const mapping = {
     scenario: "检索增强生成"
   },
   "art": {
-    title: "Automatic Reasoning and Tool-use (ART)",
-    scenario: "自动推理并使用工具"
+    title: "ART · Automatic Reasoning and Tool-use",
+    scenario: "自动推理并使用工具 (Automatic Reasoning and Tool-use, ART)"
   },
   "ape": {
     title: "Automatic Prompt Engineer (APE)",

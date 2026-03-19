@@ -258,20 +258,18 @@ const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.
         </div>
       </div>
 
-      <!-- RIGHT COLUMN: Full-height AI Output with integrated toggle -->
+      <!-- RIGHT COLUMN: Toggle compare only when there are truly two prompt states -->
       <div
+        v-if="manifestoUsesToggle"
         class="flex flex-col min-h-0 overflow-hidden rounded-[24px] border border-slate-200/60 bg-white/80 shadow-lg"
         v-bind="motion('chat')"
       >
-        <!-- Header with integrated prompt toggle -->
         <div class="flex items-center justify-between px-6 py-3.5 border-b border-slate-100 bg-slate-50/50 shrink-0">
           <span class="text-[13px] font-bold text-slate-700">
-            {{ slide.title }} Prompt Evolution
+            {{ slide.payload.panelTitle ?? `${slide.title} Prompt Evolution` }}
           </span>
 
-          <!-- Toggle Switch -->
           <div
-            v-if="manifestoUsesToggle"
             class="ape-toggle flex items-center rounded-full border p-0.5 cursor-pointer select-none transition-all duration-300"
             :class="isApeCorrected
               ? 'bg-emerald-50 border-emerald-200'
@@ -295,32 +293,31 @@ const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.
               {{ slide.payload.afterLabel || 'APE 优化' }}
             </span>
           </div>
-
-          <div
-            v-else
-            class="flex items-center gap-2 text-[11px] font-bold"
-          >
-            <span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-500">
-              {{ slide.payload.beforeLabel || 'Prompt' }}
-            </span>
-            <span class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-emerald-700">
-              {{ slide.payload.afterLabel || 'AI 输出' }}
-            </span>
-          </div>
         </div>
 
-        <!-- Scrollable chat content (FULL HEIGHT) -->
         <div class="flex-1 min-h-0 overflow-auto px-6 py-5 custom-scrollbar-chat">
           <StreamingChat
-            :key="manifestoUsesToggle
-              ? (isApeCorrected ? 'manifesto-opt' : 'manifesto-raw')
-              : 'manifesto-single'"
+            :key="isApeCorrected ? 'manifesto-opt' : 'manifesto-raw'"
             :prompt="manifestoChatItem.prompt"
             :response="manifestoChatItem.response"
             compact
             auto-start
           />
         </div>
+      </div>
+
+      <div
+        v-else
+        class="min-h-0"
+        v-bind="motion('chat')"
+      >
+        <StreamingChat
+          key="manifesto-single"
+          :prompt="manifestoChatItem.prompt"
+          :response="manifestoChatItem.response"
+          compact
+          auto-start
+        />
       </div>
     </div>
 

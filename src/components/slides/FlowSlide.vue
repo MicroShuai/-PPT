@@ -12,9 +12,12 @@ const props = defineProps<{
 const diagramRef = ref<HTMLDivElement | null>(null); // Mermaid 图表容器引用
 const layout = computed(() => props.slide.variant ?? 'route'); // 流程图布局变体
 const isArtSlide = computed(() => props.slide.id === 'art'); // 是否为 ART (Automatic Reasoning and Tool-use) 幻灯片
+const isArtRuntimeSlide = computed(() => props.slide.id === 'art-runtime'); // 是否为 ART 工具调用闭环页
 const storyboard = computed(() => props.slide.payload.storyboard); // 故事板数据（用于逐步演示）
 const checkpoints = computed(() => props.slide.payload.checkpoints ?? []); // 流程关键节点
 const challengePoints = computed(() => props.slide.payload.challenge ?? []); // 面临的挑战或痛点
+const takeawayLabel = computed(() => props.slide.payload.takeawayLabel ?? 'Tips'); // 金句/提示标签
+const artTips = computed(() => props.slide.payload.tips ?? []); // ART 页额外 tips
 const hasDiagram = computed(() => Boolean(props.slide.payload.mermaid)); // 是否包含 Mermaid 流程图定义
 const isBareDiagram = computed(() => layout.value === 'diagram-only' && props.slide.hideHeader); // 纯图表模式（隐藏标题）
 const { motion } = useSlideMotion(toRef(props, 'slide')); // 动画控制
@@ -282,7 +285,7 @@ watch(
         v-bind="motion('quote')"
       >
         <p class="slide-label relative mb-2 text-amber-700">
-          分享金句
+          {{ takeawayLabel }}
         </p>
         <p class="relative text-[15px] font-medium leading-6 text-amber-900">
           {{ slide.payload.takeaway }}
@@ -313,7 +316,7 @@ watch(
             v-bind="motion('quote')"
           >
             <p class="slide-label mb-2 text-amber-700">
-              分享金句
+              {{ takeawayLabel }}
             </p>
             <p class="text-[15px] font-medium leading-6 text-amber-900">
               {{ slide.payload.takeaway }}
@@ -355,47 +358,42 @@ watch(
 
     <div
       v-else-if="isArtSlide"
-      class="grid h-full min-h-0 min-w-0 grid-cols-[0.9fr_1.1fr] gap-5"
+      class="grid h-full min-h-0 min-w-0 grid-cols-[0.8fr_1.2fr] gap-4"
     >
-      <div class="grid min-h-0 min-w-0 grid-rows-[auto_auto_minmax(0,1fr)_auto] gap-4">
+      <div class="grid min-h-0 min-w-0 grid-rows-[auto_auto_minmax(0,1fr)] gap-3">
         <div
           v-if="slide.payload.scenario"
-          class="slide-stage px-6 py-5"
+          class="slide-stage px-5 py-4"
           v-bind="motion('lead')"
         >
-          <p class="slide-label mb-3 text-blue-700/80">
+          <p class="slide-label mb-2 text-blue-700/80">
             {{ slide.payload.scenarioLabel ?? 'Technique' }}
           </p>
-          <h3 class="text-[28px] font-semibold leading-tight text-slate-900">
+          <h3 class="text-[26px] font-semibold leading-tight text-slate-900">
             {{ slide.payload.scenario }}
           </h3>
           <p
-            v-if="slide.subtitle"
-            class="mt-3 text-[15px] leading-6 text-slate-600"
+            class="mt-3 text-[14px] leading-6 text-slate-600"
           >
-            {{ slide.subtitle }}
+            {{ slide.payload.description }}
           </p>
         </div>
 
         <div
-          class="slide-frost px-6 py-5"
+          class="slide-frost px-5 py-4"
           v-bind="motion('panel')"
         >
-          <p class="slide-label mb-3 text-blue-700/80">
+          <p class="slide-label mb-2 text-blue-700/80">
             {{ slide.payload.challengeLabel ?? diagramLabel }}
           </p>
-          <p class="text-base leading-7 text-slate-700">
-            {{ slide.payload.description }}
-          </p>
-
           <ul
             v-if="challengePoints.length > 0"
-            class="mt-4 space-y-2.5"
+            class="space-y-2.5"
           >
             <li
               v-for="(item, index) in challengePoints"
               :key="item"
-              class="rounded-xl bg-white/70 px-4 py-3 text-[14px] leading-6 text-slate-600"
+              class="rounded-2xl border border-white/70 bg-white/75 px-4 py-3 text-[13px] leading-5 text-slate-600"
               v-bind="motion('checkpoint', index)"
             >
               {{ item }}
@@ -404,68 +402,287 @@ watch(
         </div>
 
         <div
+          class="slide-quote-card min-h-0 px-5 py-4"
+          v-bind="motion('quote')"
+        >
+          <p class="slide-label mb-3 text-amber-700 font-bold flex items-center gap-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="text-amber-500"
+            >
+              <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+              <path d="M9 18h6" />
+              <path d="M10 22h4" />
+            </svg>
+            {{ takeawayLabel }}
+          </p>
+          <p class="relative text-[14px] font-medium leading-6 text-amber-900">
+            {{ slide.payload.takeaway }}
+          </p>
+
+          <div
+            v-if="artTips.length > 0"
+            class="mt-4"
+          >
+            <ul class="space-y-2.5">
+              <li
+              v-for="(item, index) in artTips"
+              :key="item"
+              class="text-[13px] leading-relaxed text-amber-900/80 font-medium flex items-start gap-2.5"
+              v-bind="motion('card', index)"
+              >
+                <span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-amber-400" />
+                {{ item }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid min-h-0 min-w-0">
+        <div
           v-if="slide.payload.promptPanel"
-          class="slide-rail-card min-h-0 px-6 py-5"
+          class="slide-rail-card min-h-0 overflow-hidden px-5 py-4"
+          v-bind="motion('rail')"
+        >
+          <div class="mb-3 flex items-start justify-between gap-4">
+            <div>
+              <p class="slide-label mb-2 text-blue-700/80">
+                {{ slide.payload.promptPanel.title }}
+              </p>
+              <p
+                v-if="slide.payload.promptPanel.background"
+                class="text-[13px] leading-5 text-slate-600"
+              >
+                <span class="font-semibold text-slate-900">场景背景：</span>{{ slide.payload.promptPanel.background }}
+              </p>
+            </div>
+          </div>
+
+          <div class="grid min-h-0 gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(280px,0.96fr)]">
+            <div class="space-y-3 min-w-0">
+              <div class="rounded-[22px] border border-slate-200/80 bg-white/75 px-4 py-3.5">
+                <p class="slide-label mb-2 text-blue-700/80">
+                  {{ slide.payload.promptPanel.instructionTitle ?? '提示词设计' }}
+                </p>
+                <p class="text-[13px] leading-5 text-slate-700">
+                  {{ slide.payload.promptPanel.instruction }}
+                </p>
+
+                <div class="mt-3">
+                  <p class="slide-label mb-2 text-blue-700/80">
+                    {{ slide.payload.promptPanel.toolsTitle ?? '可用工具' }}
+                  </p>
+                  <div class="grid gap-2 sm:grid-cols-2">
+                    <article
+                      v-for="(tool, index) in slide.payload.promptPanel.tools"
+                      :key="tool.name"
+                      class="rounded-[18px] border border-slate-200/80 bg-slate-50/85 px-3.5 py-3"
+                      v-bind="motion('card', index)"
+                    >
+                      <p class="text-[12px] font-semibold text-slate-900">
+                        {{ tool.name }}
+                      </p>
+                      <p class="mt-1 text-[11px] leading-5 text-slate-600">
+                        {{ tool.detail }}
+                      </p>
+                    </article>
+                  </div>
+                </div>
+
+                <div class="mt-3 rounded-[18px] border border-amber-200/80 bg-amber-50/85 px-3.5 py-3">
+                  <p class="slide-label mb-1 text-amber-700">
+                    {{ slide.payload.promptPanel.taskLabel ?? 'Task' }}
+                  </p>
+                  <p class="text-[13px] font-medium leading-5 text-amber-900">
+                    {{ slide.payload.promptPanel.task }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-[22px] border border-blue-200/70 bg-blue-50/40 px-4 py-3.5">
+              <p class="slide-label mb-2 text-blue-700/80">
+                场景目标
+              </p>
+              <p class="text-[13px] leading-6 text-slate-700">
+                通过数据库查询和精确计算，判断批次 <span class="font-semibold text-slate-900">LOT-20260314</span> 的物料损耗率是否超标，并输出可执行结论。
+              </p>
+
+              <div class="mt-4 rounded-[18px] border border-white/80 bg-white/75 px-4 py-3">
+                <p class="slide-label mb-2 text-blue-700/80">
+                  适合场景
+                </p>
+                <ul class="space-y-2">
+                  <li class="flex items-start gap-2.5 text-[12px] leading-5 text-slate-700">
+                    <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" />
+                    精准计算
+                  </li>
+                  <li class="flex items-start gap-2.5 text-[12px] leading-5 text-slate-700">
+                    <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" />
+                    实时状态查询
+                  </li>
+                  <li class="flex items-start gap-2.5 text-[12px] leading-5 text-slate-700">
+                    <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" />
+                    外部系统集成
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      v-else-if="isArtRuntimeSlide"
+      class="grid h-full min-h-0 min-w-0 grid-cols-[0.82fr_1.18fr] gap-4"
+    >
+      <div class="grid min-h-0 min-w-0 grid-rows-[auto_minmax(0,1fr)_auto] gap-3">
+        <div
+          class="slide-stage px-5 py-4"
+          v-bind="motion('lead')"
+        >
+          <p class="slide-label mb-2 text-blue-700/80">
+            {{ slide.payload.scenarioLabel ?? 'TOOL LOOP' }}
+          </p>
+          <h3 class="text-[26px] font-semibold leading-tight text-slate-900">
+            {{ slide.payload.scenario }}
+          </h3>
+          <p class="mt-3 text-[14px] leading-6 text-slate-600">
+            {{ slide.payload.description }}
+          </p>
+        </div>
+
+        <div
+          class="slide-rail-card min-h-0 overflow-hidden px-5 py-4"
           v-bind="motion('rail')"
         >
           <p class="slide-label mb-3 text-blue-700/80">
-            {{ slide.payload.promptPanel.title }}
+            {{ slide.payload.promptPanel?.trackTitle ?? '执行轨迹' }}
           </p>
-
-          <div class="space-y-4 text-slate-700">
-            <p class="text-[15px] leading-6">
-              {{ slide.payload.promptPanel.instruction }}
-            </p>
-
-            <div class="grid gap-3 sm:grid-cols-2">
-              <article
-                v-for="(tool, index) in slide.payload.promptPanel.tools"
-                :key="tool.name"
-                class="rounded-[22px] border border-slate-200/80 bg-white/70 px-4 py-3"
-                v-bind="motion('card', index)"
-              >
-                <p class="text-sm font-semibold text-slate-900">
-                  {{ tool.name }}
-                </p>
-                <p class="mt-1 text-[13px] leading-5 text-slate-600">
-                  {{ tool.detail }}
-                </p>
-              </article>
-            </div>
-
-            <div class="rounded-[22px] border border-amber-200/80 bg-amber-50/80 px-4 py-3">
-              <p class="slide-label mb-1 text-amber-700">
-                Task
+          <div class="space-y-2.5">
+            <article
+              v-for="(step, index) in slide.payload.promptPanel?.track ?? []"
+              :key="`${step.label}-${index}`"
+              class="rounded-[18px] border border-slate-200/80 bg-white/75 px-4 py-3"
+              v-bind="motion('checkpoint', index)"
+            >
+              <p class="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                {{ step.label }}
               </p>
-              <p class="text-[15px] font-medium leading-6 text-amber-900">
-                {{ slide.payload.promptPanel.task }}
-              </p>
-            </div>
+              <div class="space-y-1.5 text-[12px] leading-5 text-slate-700">
+                <p v-if="step.thought">
+                  <span class="font-semibold text-slate-900">Reason：</span>{{ step.thought }}
+                </p>
+                <p
+                  v-if="step.action"
+                  class="text-emerald-950/85"
+                >
+                  <span class="font-semibold text-emerald-800">Action：</span>{{ step.action }}
+                </p>
+                <p v-if="step.observation">
+                  <span class="font-semibold text-slate-900">Observation：</span>{{ step.observation }}
+                </p>
+                <p
+                  v-if="step.conclusion"
+                  class="font-medium text-amber-900"
+                >
+                  {{ step.conclusion }}
+                </p>
+              </div>
+            </article>
           </div>
         </div>
 
         <div
-          class="slide-quote-card px-6 py-5"
+          class="slide-quote-card px-5 py-4 bg-amber-50/60 border-amber-200/50"
           v-bind="motion('quote')"
         >
-          <p class="slide-label relative mb-3 text-amber-700">
-            分享金句
+          <p class="slide-label mb-3 text-amber-700 font-bold flex items-center gap-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="text-amber-500"
+            >
+              <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+              <path d="M9 18h6" />
+              <path d="M10 22h4" />
+            </svg>
+            {{ takeawayLabel }}
           </p>
-          <p class="relative text-base font-medium leading-7 text-amber-900">
+          <p class="text-[13px] font-medium leading-6 text-amber-900">
             {{ slide.payload.takeaway }}
           </p>
+          <ul class="mt-3 space-y-2.5">
+            <li
+              v-for="(item, index) in artTips"
+              :key="item"
+              class="text-[12px] leading-relaxed text-amber-900/80 font-medium flex items-start gap-2.5"
+              v-bind="motion('card', index)"
+            >
+              <span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-amber-400" />
+              {{ item }}
+            </li>
+          </ul>
         </div>
       </div>
 
-      <div
-        class="slide-stage min-h-0 min-w-0 overflow-hidden p-5"
-        v-bind="motion('diagram')"
-      >
+      <div class="grid min-h-0 min-w-0 grid-rows-[minmax(0,1fr)_minmax(260px,0.72fr)] gap-3">
         <div
-          v-if="hasDiagram"
-          ref="diagramRef"
-          class="h-full w-full min-w-0 overflow-hidden [&>svg]:h-full [&>svg]:w-full [&>svg]:max-w-full"
-        />
+          class="slide-rail-card min-h-0 overflow-hidden px-5 py-4"
+          v-bind="motion('code')"
+        >
+          <p class="slide-label mb-3 text-blue-700/80">
+            {{ slide.payload.promptPanel?.snippetsTitle ?? '工具调用 / 后端处理' }}
+          </p>
+          <div class="grid min-h-0 gap-3 md:grid-cols-2">
+            <article
+              v-for="(snippet, index) in slide.payload.promptPanel?.snippets ?? []"
+              :key="`${snippet.label}-${index}`"
+              class="overflow-hidden rounded-[18px] border border-slate-200 bg-slate-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+              v-bind="motion('code', index)"
+            >
+              <div class="border-b border-white/10 bg-slate-900/90 px-3 py-2">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-300">
+                  {{ snippet.label }}
+                </p>
+              </div>
+              <div class="px-3 py-2.5">
+                <code class="block whitespace-pre-wrap font-mono text-[10px] leading-[1.5] text-slate-100">{{ snippet.code }}</code>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div
+          class="slide-stage min-h-0 min-w-0 overflow-hidden px-5 py-4"
+          v-bind="motion('diagram')"
+        >
+          <p class="slide-label mb-3 text-blue-700/80">
+            流程图
+          </p>
+          <div
+            v-if="hasDiagram"
+            ref="diagramRef"
+            class="h-[calc(100%-1.5rem)] w-full min-w-0 overflow-hidden [&>svg]:h-full [&>svg]:w-full [&>svg]:max-w-full"
+          />
+        </div>
       </div>
     </div>
 
@@ -574,7 +791,7 @@ watch(
           v-bind="motion('quote')"
         >
           <p class="slide-label relative mb-3 text-amber-700">
-            分享金句
+            {{ takeawayLabel }}
           </p>
           <p class="relative text-base font-medium leading-7 text-amber-900">
             {{ slide.payload.takeaway }}

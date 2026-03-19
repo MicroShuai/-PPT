@@ -342,7 +342,7 @@
         "beforePrompt": "请帮我看一下这段 Python 脚本，你能给我挑挑毛病吗？",
         "afterLabel": "专业指令",
         "afterPrompt": "审查以下 Python 代码片段。找出其中存在并发性能风险的 3 个位置，并以 Markdown 表格形式输出优化建议。",
-        "learningsLabel": "分享金句",
+        "learningsLabel": "Tips",
         "learnings": [
           "和 AI 沟通，不需要礼貌，只需要精确。",
           "去人格化、直切主题的技术文档式沟通，是确保 AI 产出达到工程级可用标准的先决条件。"
@@ -441,7 +441,7 @@
         "beforePrompt": "判断下面 SQL 是否存在性能风险。\n\nSQL： SELECT * FROM user WHERE id = 1;\n结果： 低风险\n\nSQL： SELECT * FROM mes_operation WHERE FIND_IN_SET('OP001', operation_no);\n结果： 高风险\n\n任务下达： SELECT * FROM order_info WHERE create_time >= '2026-01-01';\n输出结果：",
         "afterLabel": "AI 输出结果",
         "afterResponse": "低风险",
-        "learningsLabel": "分享金句",
+        "learningsLabel": "Tips",
         "learnings": [
           "少样本提示的核心不是“解释原理”，而是“先给 AI 看几个标准答案”。"
         ],
@@ -495,7 +495,7 @@
         "beforePrompt": "请一步一步分析下面这个方法是否应该加 @Transactional，并说明原因。\n\n场景：\n该方法会先保存订单主表，再保存订单明细表。\n如果第二步失败，第一步也必须回滚。\n\n请按以下格式输出：\n第1步：\n第2步：\n第3步：\n结论：",
         "afterLabel": "AI 逐步推理响应",
         "afterResponse": "第1步：该方法包含两次数据库写操作，分别是保存订单主表和保存订单明细表。\n第2步：这两个操作属于同一个业务动作，要求要么都成功，要么都失败。\n第3步：如果第二步失败但第一步成功，会导致订单数据不一致。\n\n结论：该方法应该加 @Transactional，以保证事务一致性。",
-        "learningsLabel": "分享金句",
+        "learningsLabel": "Tips",
         "learnings": [
           "思维链：AI 把推理过程展开，再得出结论。",
           "先把业务动作与失败后果讲清楚，再下事务结论，结果更稳也更容易审查。"
@@ -643,7 +643,7 @@
             "value": "全局更优"
           }
         ],
-        "learningsLabel": "分享金句",
+        "learningsLabel": "Tips",
         "learnings": [
           "思维树的核心不是“给一个答案”，而是“先发散、再收敛”。",
           "它很适合复杂架构设计和上线决策。",
@@ -661,6 +661,7 @@
       "payload": {
         "scenarioLabel": "Technique",
         "scenario": "检索增强生成 (RAG)",
+        "panelTitle": "RAG 提示词演进示例",
         "challengeLabel": "核心逻辑",
         "challenge": [
           "模型懂通用知识，但不懂你们公司特定的 API 规范和私有字段",
@@ -699,14 +700,17 @@
       "id": "art",
       "type": "flow",
       "eyebrow": "技术核心 10",
-      "title": "ART",
+      "title": "ART · Automatic Reasoning and Tool-use",
       "subtitle": "让 AI 从“文科生”变“理科生”，主动调用外部数据库或 API。",
       "payload": {
-        "scenario": "自动推理并使用工具 (ART)",
-        "description": "不要让 AI 凭空猜数据。规定好工具集，让 AI 自己决定什么时候该去查库、什么时候该去调用 API。",
+        "scenario": "自动推理并使用工具",
+        "description": "让 AI 从“只会说话的文科生”变成“会按计算器、会查数据库的理科生”。",
         "promptPanel": {
           "title": "案例：复杂产线批次数据排查",
+          "background": "产线反馈某个批次的物料消耗数据对不上。",
+          "instructionTitle": "提示词设计（模拟 ART 过程）",
           "instruction": "你是一个产线数据排查助手。当你需要获取实时数据或进行计算时，你可以输出特定指令来调用工具。",
+          "toolsTitle": "可用工具",
           "tools": [
             {
               "name": "[查询数据库]",
@@ -717,25 +721,95 @@
               "detail": "传入数学表达式，返回精确结果。"
             }
           ],
-          "task": "排查批次 \"LOT-20260314\" 损耗率（标准 < 2%）。"
+          "taskLabel": "任务",
+          "task": "排查批次 \"LOT-20260314\" 的物料损耗率是否超标（标准 < 2%）。"
         },
-        "mermaid": "flowchart LR\n    Task[\"任务\\n是否超标\"] --> Step1[\"查库\\n1050/1000\"] --> Step2[\"计算\\n4.76%\"] --> Final[\"结论\\n超标异常\"]",
-        "checkpoints": [
-          "AI 推理 (Reasoning)：我需要先查批次领料与产出总数。",
-          "AI 行动 (Acting)：调用工具 [查询数据库] 获得 1050 和 1000。",
-          "AI 观察 (Observation)：利用 [精确计算器] 算出损耗率为 4.76%。",
-          "最终结论：4.76% > 2%，存在超标异常。"
-        ],
         "takeaway": "ART 将 AI 从“只会说话”变成“会查数、会计算”，是构建工程级智能助手的基石。",
         "scenarioLabel": "TECHNIQUE",
         "challengeLabel": "核心逻辑",
         "challenge": [
-          "AI 推理 (Reason) -> 行动 (Action) -> 观察 (Observation)",
-          "不要让 AI 猜数据，必须通过工具获取精准事实",
-          "适合精准计算、实时状态查询或外部系统集成"
+          "AI 模型本身不擅长做精准的数学计算或获取实时状态。",
+          "遇到这些弱项时，先调用工具拿到结果，再继续往下推理。",
+          "核心链路：Reason -> Action -> Observation。"
+        ],
+        "tips": [
+          "不要让 AI 凭空猜数据，先定义好工具集和调用边界。",
+          "高级用法是让 AI 自己判断什么时候该查库、什么时候该调用 API。",
+          "适合精准计算、实时状态查询和外部系统集成场景。"
         ],
         "beforeLabel": "案例：产线批次损耗率排查",
         "icon": "tech"
+      }
+    },
+    {
+      "id": "art-runtime",
+      "type": "flow",
+      "eyebrow": "技术核心 10",
+      "title": "ART · Automatic Reasoning and Tool-use",
+      "subtitle": "模型负责判断什么时候用工具，后端负责执行工具并把结果再喂回模型。",
+      "payload": {
+        "scenarioLabel": "TOOL LOOP",
+        "scenario": "工具调用与后端闭环",
+        "description": "你的程序每次拿到模型响应后，都要先检查它是不是 tool call；如果是，就执行工具并把结果重新发回模型。",
+        "challengeLabel": "后端处理链路",
+        "challenge": [
+          "用户发问题。",
+          "后端把问题 + tools 发给模型。",
+          "模型返回后，后端先判断：普通文本直接返回；tool_call 则调用对应工具。",
+          "工具返回结果后，后端把结果再喂给模型，模型继续输出。"
+        ],
+        "checkpoints": [
+          "AI 推理（Reason）：我需要先知道这个批次的领料总数和实际产出消耗数。",
+          "AI 行动（Action）：调用 [查询数据库]，查询 total_issue 和 actual_consume。",
+          "观察结果（Observation）：返回 1050 和 1000。",
+          "再次推理：调用 [精确计算器] 计算损耗率，得到 4.76%，结论为超标异常。"
+        ],
+        "promptPanel": {
+          "title": "AI 的推理与工具使用轨迹（模拟）",
+          "instruction": "以下内容分别展示模型侧的工具调用返回，以及服务端收到 tool_call 后的处理循环。",
+          "tools": [],
+          "task": "批次 LOT-20260314：损耗率 4.76%，已超过 2% 标准。",
+          "trackTitle": "执行轨迹",
+          "track": [
+            {
+              "label": "Step 1",
+              "thought": "我需要先知道这个批次的领料总数和实际产出消耗数，我应该去查数据库。",
+              "action": "调用工具 [查询数据库]: SELECT total_issue, actual_consume FROM material_lot WHERE lot_no = 'LOT-20260314'",
+              "observation": "返回结果 {total_issue: 1050, actual_consume: 1000}"
+            },
+            {
+              "label": "Step 2",
+              "thought": "我需要计算损耗率：(1050 - 1000) / 1050。我算不太准，需要用计算器。",
+              "action": "调用工具 [精确计算器]: (1050 - 1000) / 1050",
+              "observation": "返回结果 0.0476 (4.76%)"
+            },
+            {
+              "label": "结论",
+              "conclusion": "批次 LOT-20260314 的物料损耗率为 4.76%，已超过 2% 的标准值，存在超标异常。"
+            }
+          ],
+          "snippetsTitle": "工具调用 / 后端处理",
+          "snippets": [
+            {
+              "label": "tool_call 返回",
+              "language": "json",
+              "code": "{\n  \"tool_call\": {\n    \"name\": \"query_database\",\n    \"arguments\": {\n      \"sql\": \"SELECT total_issue, actual_consume FROM material_lot WHERE lot_no = 'LOT-20260314'\"\n    }\n  }\n}"
+            },
+            {
+              "label": "服务端循环",
+              "language": "java",
+              "code": "LlmResponse response = llm.chat(messages, tools);\n\nif (response.hasToolCall()) {\n    ToolCall toolCall = response.getToolCall();\n    String toolName = toolCall.getName();\n    Map<String, Object> args = toolCall.getArguments();\n\n    Object result = executeTool(toolName, args);\n\n    // 把工具结果再发给模型\n} else {\n    return response.getContent();\n}\n\n// 你的程序每次拿到模型响应后，检查它是不是 tool call"
+            }
+          ]
+        },
+        "mermaid": "flowchart LR\n    Task[\"任务\\n是否超标\"] --> Step1[\"查库\\n1050/1000\"] --> Step2[\"计算\\n4.76%\"] --> Final[\"结论\\n超标异常\"]",
+        "takeawayLabel": "Tips",
+        "takeaway": "不要让 AI 凭空猜数据。高级做法是规定好工具集，让模型自己决定什么时候查库、什么时候调用 API。",
+        "tips": [
+          "模型负责决策，工具负责提供真实数据与精确结果。",
+          "后端必须实现 tool call 检测、执行、回填这条闭环。",
+          "这类模式非常适合研发排障、实时查询和业务规则核验。"
+        ]
       }
     },
     {
@@ -799,7 +873,7 @@
             "value": "更适合模板化"
           }
         ],
-        "learningsLabel": "分享金句",
+        "learningsLabel": "Tips",
         "learnings": [
           "不是替 AI 把所有活都干了，而是让 AI 先暴露不会的点。",
           "人只负责教最难的那部分，剩下的再交给 AI 扩散生成。",
@@ -838,7 +912,7 @@
             "value": "显著提升"
           },
           {
-            "label": "分享金句",
+            "label": "Tips",
             "value": "给对关键线索"
           }
         ],
@@ -939,7 +1013,7 @@
             "value": "显著减少"
           },
           {
-            "label": "分享金句",
+            "label": "Tips",
             "value": "先自审再输出"
           }
         ],

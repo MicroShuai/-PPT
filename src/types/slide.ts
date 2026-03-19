@@ -112,6 +112,7 @@ export interface CaseStudySlidePayload {
   icon?: string
   scenarioLabel?: string
   challengeLabel?: string
+  panelTitle?: string
   beforeLabel?: string
   afterLabel?: string
   learningsLabel?: string
@@ -138,6 +139,8 @@ export interface FlowSlidePayload {
   scenario?: string
   challengeLabel?: string
   challenge?: string[]
+  takeawayLabel?: string
+  tips?: string[]
   description: string
   mermaid?: string
   checkpoints?: string[]
@@ -145,11 +148,29 @@ export interface FlowSlidePayload {
   promptPanel?: {
     title: string
     instruction: string
+    background?: string
+    instructionTitle?: string
+    toolsTitle?: string
     tools: Array<{
       name: string
       detail: string
     }>
     task: string
+    taskLabel?: string
+    trackTitle?: string
+    track?: Array<{
+      label: string
+      thought?: string
+      action?: string
+      observation?: string
+      conclusion?: string
+    }>
+    snippetsTitle?: string
+    snippets?: Array<{
+      label: string
+      language?: string
+      code: string
+    }>
   }
   storyboard?: {
     conceptTitle: string

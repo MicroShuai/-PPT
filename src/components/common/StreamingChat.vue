@@ -14,30 +14,30 @@ type ResponseAlert = {
 
 // 代码语言标签映射，用于在代码块头部显示友好的名称
 const LANGUAGE_LABELS: Record<string, string> = {
-  js: 'JavaScript 代码',
-  jsx: 'JSX 代码',
-  ts: 'TypeScript 代码',
-  tsx: 'TSX 代码',
-  java: 'Java 代码',
-  kotlin: 'Kotlin 代码',
-  swift: 'Swift 代码',
-  python: 'Python 代码',
-  py: 'Python 代码',
-  go: 'Go 代码',
-  rust: 'Rust 代码',
-  sql: 'SQL 代码',
-  json: 'JSON 数据',
-  xml: 'XML 配置',
-  yaml: 'YAML 配置',
-  yml: 'YAML 配置',
-  bash: 'Bash 脚本',
-  shell: 'Shell 脚本',
-  sh: 'Shell 脚本',
-  html: 'HTML 代码',
-  css: 'CSS 代码',
-  vue: 'Vue 代码',
-  text: '代码示例',
-  plaintext: '代码示例'
+  js: 'JavaScript',
+  jsx: 'JSX',
+  ts: 'TypeScript',
+  tsx: 'TSX',
+  java: 'Java',
+  kotlin: 'Kotlin',
+  swift: 'Swift',
+  python: 'Python',
+  py: 'Python',
+  go: 'Go',
+  rust: 'Rust',
+  sql: 'SQL',
+  json: 'JSON',
+  xml: 'XML',
+  yaml: 'YAML',
+  yml: 'YAML',
+  bash: 'Bash',
+  shell: 'Shell',
+  sh: 'Shell',
+  html: 'HTML',
+  css: 'CSS',
+  vue: 'Vue',
+  text: 'Code',
+  plaintext: 'Code'
 }
 
 const props = defineProps<{
@@ -158,8 +158,8 @@ const parseResponseContent = (value: string): { alerts: ResponseAlert[]; blocks:
 
 const getCodeBlockLabel = (language?: string) => {
   const normalized = language?.trim().toLowerCase()
-  if (!normalized) return '代码示例'
-  return LANGUAGE_LABELS[normalized] || `${normalized.toUpperCase()} 代码`
+  if (!normalized) return 'Code'
+  return LANGUAGE_LABELS[normalized] || normalized.toUpperCase()
 }
 
 // 从原始响应中提取“思考过程”部分
@@ -557,39 +557,6 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
-        <div
-          v-for="(alert, index) in responseAlerts"
-          :key="`${alert.label}-${index}-${alert.content}`"
-          class="response-alert shrink-0 flex items-start gap-3 rounded-[18px] border border-amber-200/80 bg-amber-50/80 px-4 py-3.5 shadow-sm"
-        >
-          <div class="response-alert__icon mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.4"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
-              <path d="M12 9v4" />
-              <path d="M12 17h.01" />
-            </svg>
-          </div>
-          <div class="min-w-0">
-            <p class="text-[10px] font-black uppercase tracking-[0.16em] text-amber-700/80">
-              {{ alert.label }}
-            </p>
-            <p class="mt-1 text-[13px] leading-[1.65] text-slate-700 whitespace-pre-wrap">
-              {{ alert.content }}
-            </p>
-          </div>
-        </div>
-
         <!-- Main Response Block -->
         <div
           ref="responseScrollEl"
@@ -604,16 +571,15 @@ onBeforeUnmount(() => {
                 v-if="block.type === 'code'"
                 class="response-code-shell overflow-hidden rounded-[18px] border border-slate-200 bg-slate-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
               >
-                <div class="response-code-header flex items-center justify-between border-b border-white/10 bg-slate-900/90 px-4 py-2.5">
+                <div class="response-code-header flex items-center gap-3 border-b border-white/10 bg-slate-900/90 px-4 py-2.5">
                   <div class="flex items-center gap-2">
                     <span class="h-2 w-2 rounded-full bg-rose-400" />
                     <span class="h-2 w-2 rounded-full bg-amber-400" />
                     <span class="h-2 w-2 rounded-full bg-emerald-400" />
                   </div>
-                  <span class="text-[11px] font-bold tracking-[0.08em] text-slate-300">
+                  <span class="ml-auto text-right text-[11px] font-bold tracking-[0.08em] text-slate-300">
                     {{ getCodeBlockLabel(block.language) }}
                   </span>
-                  <span class="w-8 shrink-0" />
                 </div>
                 <div class="response-code-block overflow-x-auto px-4 py-3.5">
                   <code class="block text-[13px] leading-[1.65] text-slate-100 font-mono whitespace-pre">{{ block.content }}</code>
@@ -644,6 +610,39 @@ onBeforeUnmount(() => {
             >
               <span class="typing-cursor ml-0.5" />
             </div>
+          </div>
+        </div>
+
+        <div
+          v-for="(alert, index) in responseAlerts"
+          :key="`${alert.label}-${index}-${alert.content}`"
+          class="response-alert shrink-0 flex items-start gap-3 rounded-[18px] border border-amber-200/80 bg-amber-50/80 px-4 py-3.5 shadow-sm"
+        >
+          <div class="response-alert__icon mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.4"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+              <path d="M12 9v4" />
+              <path d="M12 17h.01" />
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <p class="text-[10px] font-black uppercase tracking-[0.16em] text-amber-700/80">
+              {{ alert.label }}
+            </p>
+            <p class="mt-1 text-[13px] leading-[1.65] text-slate-700 whitespace-pre-wrap">
+              {{ alert.content }}
+            </p>
           </div>
         </div>
       </div>
