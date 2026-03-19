@@ -1,104 +1,107 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, toRef, watch } from 'vue';
-import SlideShell from '@/components/common/SlideShell.vue';
-import { useSlideMotion } from '@/composables/useSlideMotion';
-import { renderMermaid } from '@/lib/mermaid';
-import type { FlowSlideDefinition } from '@/types/slide';
+import { computed, onMounted, ref, toRef, watch } from 'vue'
+import SlideShell from '@/components/common/SlideShell.vue'
+import { useSlideMotion } from '@/composables/useSlideMotion'
+import { renderMermaid } from '@/lib/mermaid'
+import type { FlowSlideDefinition } from '@/types/slide'
 
 const props = defineProps<{
-  slide: FlowSlideDefinition;
-}>();
+  slide: FlowSlideDefinition
+}>()
 
-const diagramRef = ref<HTMLDivElement | null>(null);
-const layout = computed(() => props.slide.variant ?? 'route');
-const isArtSlide = computed(() => props.slide.id === 'art');
-const storyboard = computed(() => props.slide.payload.storyboard);
-const checkpoints = computed(() => props.slide.payload.checkpoints ?? []);
-const hasDiagram = computed(() => Boolean(props.slide.payload.mermaid));
-const isBareDiagram = computed(() => layout.value === 'diagram-only' && props.slide.hideHeader);
-const { motion } = useSlideMotion(toRef(props, 'slide'));
+const diagramRef = ref<HTMLDivElement | null>(null); // Mermaid 图表容器引用
+const layout = computed(() => props.slide.variant ?? 'route'); // 流程图布局变体
+const isArtSlide = computed(() => props.slide.id === 'art'); // 是否为 ART (Automatic Reasoning and Tool-use) 幻灯片
+const storyboard = computed(() => props.slide.payload.storyboard); // 故事板数据（用于逐步演示）
+const checkpoints = computed(() => props.slide.payload.checkpoints ?? []); // 流程关键节点
+const challengePoints = computed(() => props.slide.payload.challenge ?? []); // 面临的挑战或痛点
+const hasDiagram = computed(() => Boolean(props.slide.payload.mermaid)); // 是否包含 Mermaid 流程图定义
+const isBareDiagram = computed(() => layout.value === 'diagram-only' && props.slide.hideHeader); // 纯图表模式（隐藏标题）
+const { motion } = useSlideMotion(toRef(props, 'slide')); // 动画控制
 
 const rootLayoutClass = computed(() => {
   if (layout.value === 'loop') {
-    return 'grid-cols-[1.18fr_0.82fr]';
+    return 'grid-cols-[1.18fr_0.82fr]'
   }
 
   if (layout.value === 'runtime') {
-    return 'grid-cols-[1.02fr_0.98fr]';
+    return 'grid-cols-[1.02fr_0.98fr]'
   }
 
-  return 'grid-cols-[1.08fr_0.92fr]';
-});
+  return 'grid-cols-[1.08fr_0.92fr]'
+})
 
 const leftColumnClass = computed(() =>
   layout.value === 'control' ? 'grid-rows-[auto_auto_1fr]' : 'grid-rows-[auto_1fr]'
-);
+)
 
 const sideColumnClass = computed(() =>
   checkpoints.value.length > 0 ? 'grid-rows-[1fr_auto]' : 'grid-rows-[auto]'
-);
+)
 
+// 根据布局类型动态设置图表区域的标签文本
 const diagramLabel = computed(() => {
   if (layout.value === 'storyboard') {
-    return '执行流讲解';
+    return '执行流讲解'
   }
 
   if (layout.value === 'loop') {
-    return 'Thought -> Action -> Observation';
+    return 'Thought -> Action -> Observation'
   }
 
   if (layout.value === 'runtime') {
-    return 'Agent 后端链路';
+    return 'Agent 后端链路'
   }
 
   if (layout.value === 'control') {
-    return 'Reason -> Tool -> Observation';
+    return 'Reason -> Tool -> Observation'
   }
 
   if (layout.value === 'canvas' || layout.value === 'diagram-only') {
-    return '执行大图';
+    return '执行大图'
   }
 
-  return 'Workflow Blueprint';
-});
+  return 'Workflow Blueprint'
+})
 
+// 渲染 Mermaid 流程图
 async function renderDiagram(): Promise<void> {
   if (!diagramRef.value) {
-    return;
+    return
   }
 
   if (!props.slide.payload.mermaid) {
-    diagramRef.value.textContent = '';
-    return;
+    diagramRef.value.textContent = ''
+    return
   }
 
   try {
-    await renderMermaid(diagramRef.value, `${props.slide.id}-diagram`, props.slide.payload.mermaid);
+    await renderMermaid(diagramRef.value, `${props.slide.id}-diagram`, props.slide.payload.mermaid)
 
-    const svg = diagramRef.value.querySelector('svg');
+    const svg = diagramRef.value.querySelector('svg')
 
     if (svg) {
-      svg.style.maxWidth = 'none';
-      svg.style.width = '100%';
-      svg.style.height = '100%';
-      svg.style.display = 'block';
+      svg.style.maxWidth = 'none'
+      svg.style.width = '100%'
+      svg.style.height = '100%'
+      svg.style.display = 'block'
     }
   } catch (error) {
-    console.error('Failed to render mermaid diagram', error);
-    diagramRef.value.textContent = 'Mermaid 图渲染失败，请检查流程定义。';
+    console.error('Failed to render mermaid diagram', error)
+    diagramRef.value.textContent = 'Mermaid 图渲染失败，请检查流程定义。'
   }
 }
 
 onMounted(() => {
-  void renderDiagram();
-});
+  void renderDiagram()
+})
 
 watch(
   () => props.slide.payload.mermaid,
   () => {
-    void renderDiagram();
+    void renderDiagram()
   }
-);
+)
 </script>
 
 <template>
@@ -354,17 +357,50 @@ watch(
       v-else-if="isArtSlide"
       class="grid h-full min-h-0 min-w-0 grid-cols-[0.9fr_1.1fr] gap-5"
     >
-      <div class="grid min-h-0 min-w-0 grid-rows-[auto_minmax(0,1fr)_auto] gap-4">
+      <div class="grid min-h-0 min-w-0 grid-rows-[auto_auto_minmax(0,1fr)_auto] gap-4">
         <div
+          v-if="slide.payload.scenario"
           class="slide-stage px-6 py-5"
+          v-bind="motion('lead')"
+        >
+          <p class="slide-label mb-3 text-blue-700/80">
+            {{ slide.payload.scenarioLabel ?? 'Technique' }}
+          </p>
+          <h3 class="text-[28px] font-semibold leading-tight text-slate-900">
+            {{ slide.payload.scenario }}
+          </h3>
+          <p
+            v-if="slide.subtitle"
+            class="mt-3 text-[15px] leading-6 text-slate-600"
+          >
+            {{ slide.subtitle }}
+          </p>
+        </div>
+
+        <div
+          class="slide-frost px-6 py-5"
           v-bind="motion('panel')"
         >
           <p class="slide-label mb-3 text-blue-700/80">
-            {{ diagramLabel }}
+            {{ slide.payload.challengeLabel ?? diagramLabel }}
           </p>
           <p class="text-base leading-7 text-slate-700">
             {{ slide.payload.description }}
           </p>
+
+          <ul
+            v-if="challengePoints.length > 0"
+            class="mt-4 space-y-2.5"
+          >
+            <li
+              v-for="(item, index) in challengePoints"
+              :key="item"
+              class="rounded-xl bg-white/70 px-4 py-3 text-[14px] leading-6 text-slate-600"
+              v-bind="motion('checkpoint', index)"
+            >
+              {{ item }}
+            </li>
+          </ul>
         </div>
 
         <div

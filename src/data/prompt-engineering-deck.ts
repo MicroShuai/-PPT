@@ -19,7 +19,7 @@ const slideVariantMap: Record<string, string> = {
   'defense-depth': 'layers',
   'absolute-mode': 'manifesto',
   'cot-transaction': 'interactive-chat',
-  'rag': 'dossier',
+  'rag': 'manifesto',
   'tree-of-thoughts': 'interactive-chat',
   'reflexion': 'dossier',
   'personal-assistant': 'workflow',

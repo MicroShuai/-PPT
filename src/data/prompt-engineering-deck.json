@@ -494,7 +494,7 @@
         "beforeLabel": "案例：@Transactional 必要性分析",
         "beforePrompt": "请一步一步分析下面这个方法是否应该加 @Transactional，并说明原因。\n\n场景：\n该方法会先保存订单主表，再保存订单明细表。\n如果第二步失败，第一步也必须回滚。\n\n请按以下格式输出：\n第1步：\n第2步：\n第3步：\n结论：",
         "afterLabel": "AI 逐步推理响应",
-        "afterResponse": "第1步：该方法包含两次数据库写操作，分别是订单主表 and 订单明细表。\n第2步：这两个操作属于同一个业务动作，要求要么都成功，要么都失败。\n第3步：如果第二步失败但第一步成功，会导致数据不一致。\n\n结论：该方法应该加 @Transactional，以保证事务一致性。",
+        "afterResponse": "第1步：该方法包含两次数据库写操作，分别是保存订单主表和保存订单明细表。\n第2步：这两个操作属于同一个业务动作，要求要么都成功，要么都失败。\n第3步：如果第二步失败但第一步成功，会导致订单数据不一致。\n\n结论：该方法应该加 @Transactional，以保证事务一致性。",
         "learningsLabel": "分享金句",
         "learnings": [
           "思维链：AI 把推理过程展开，再得出结论。",
@@ -520,8 +520,8 @@
         ],
         "beforeLabel": "案例：Spring Boot 目录结构生成",
         "beforePrompt": "你是一名 Java 后端开发工程师，请根据需求输出完整代码。要求：\n1. 先输出项目目录结构\n2. 再按文件逐个输出代码\n3. 每个文件都要标明文件路径\n4. 代码必须可直接复制使用\n5. 不要省略 import\n\n需求：实现一个 Spring Boot 的文件上传接口，支持单文件上传，返回文件访问 URL。",
-        "afterLabel": "AI 理想输出 (目录结构)",
-        "afterResponse": "src/main/java/com/demo/file\n  controller/FileController.java\n  service/FileService.java\n  service/impl/FileServiceImpl.java\n  dto/FileUploadResponse.java",
+        "afterLabel": "AI 输出",
+        "afterResponse": "项目目录结构：\nsrc/main/java/com/demo/file\n  controller/FileController.java\n  service/FileService.java\n  service/impl/FileServiceImpl.java\n  dto/FileUploadResponse.java\n\n文件 1：src/main/java/com/demo/file/controller/FileController.java\n```java\n@RestController\n@RequestMapping(\"/files\")\npublic class FileController {\n    private final FileService fileService;\n\n    public FileController(FileService fileService) {\n        this.fileService = fileService;\n    }\n\n    @PostMapping(\"/upload\")\n    public FileUploadResponse upload(@RequestParam(\"file\") MultipartFile file) {\n        return fileService.upload(file);\n    }\n}\n```\n\n文件 2：src/main/java/com/demo/file/service/FileService.java\n```java\npublic interface FileService {\n    FileUploadResponse upload(MultipartFile file);\n}\n```\n\n说明：以上为节选展示。完整输出应继续按文件路径补全实现类、DTO 与必要配置，而不应只停留在目录结构。",
         "learningsLabel": "核心评价",
         "learnings": [
           "这样生成的结果更像真正能落地的研发产物，包含了完整的项目组织结构。"
@@ -667,10 +667,12 @@
           "“闭卷写代码”会导致模型凭空捏造参数，且在系统中跑不通",
           "RAG 本质是给模型提供真实文档参考，让回答从“科普”变成“精准定制”"
         ],
-        "beforeLabel": "案例：核对内部 API 接口规范并生成代码",
-        "beforePrompt": "你是一个后端开发。请根据下面提供的【内部 API 文档】，编写一段调用接口的 Java 代码。\n\n【API 文档】路径：/api/v1/workorder/create，参数：wo_no, prod_code (必填), line_id (可选)",
-        "afterLabel": "AI 理想输出 (开卷模式)",
-        "afterPrompt": "（AI 根据提供的文档精准生成了包含必填字段的 Java 调用代码，并对 line_id 做了可选处理...）",
+        "beforeLabel": "常规提示（闭卷）",
+        "beforePrompt": "请帮我写一段 Java 代码，调用我们 MES 系统的工单下达接口，传入工单号和产品编码。",
+        "beforeResponse": "AI 输出结果：\n```java\nMap<String, Object> body = new HashMap<>();\nbody.put(\"workOrderNo\", woNo);\nbody.put(\"productCode\", prodCode);\nbody.put(\"factoryId\", 1);\nbody.put(\"createUser\", \"system\");\n\nHttpResponse response = httpClient.post(\"/mes/workorder/issue\", body);\n```\n\n问题：字段名、接口路径、必填参数均为模型凭空猜测，代码在真实系统中无法直接运行。",
+        "afterLabel": "RAG 提示（开卷）",
+        "afterPrompt": "你是一个后端开发。请根据下面提供的【内部 API 文档】，编写一段调用“工单下达接口”的 Java 代码。如果文档中没有提到某些必填字段，请在代码中用注释标出并提醒我。\n\n【内部 API 文档】\n接口路径：/api/v1/mes/workorder/create\n请求方式：POST\n参数：wo_no (String, 必填), prod_code (String, 必填), line_id (Integer, 可选)\n成功返回：{\"code\": 200, \"msg\": \"success\", \"data\": wo_id}",
+        "afterResponse": "AI 输出结果：\n```java\nMap<String, Object> body = new HashMap<>();\nbody.put(\"wo_no\", woNo);\nbody.put(\"prod_code\", prodCode);\nif (lineId != null) {\n    body.put(\"line_id\", lineId);\n}\n\nHttpResponse response = httpClient.post(\"/api/v1/mes/workorder/create\", body);\n```\n\n说明：当前文档只声明了 `wo_no`、`prod_code`、`line_id`，若服务端还要求 token、tenantId 或签名字段，需要补充到 API 文档后再接入。",
         "outcomes": [
           {
             "label": "背景知识",

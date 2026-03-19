@@ -1,5 +1,44 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
+
+// 响应内容分块类型：支持文本和代码块
+type ResponseBlock
+  = { type: 'text', content: string }
+  | { type: 'code', content: string, language?: string }
+
+// 响应中的告警/说明信息（如“问题说明”）
+type ResponseAlert = {
+  label: string
+  content: string
+}
+
+// 代码语言标签映射，用于在代码块头部显示友好的名称
+const LANGUAGE_LABELS: Record<string, string> = {
+  js: 'JavaScript 代码',
+  jsx: 'JSX 代码',
+  ts: 'TypeScript 代码',
+  tsx: 'TSX 代码',
+  java: 'Java 代码',
+  kotlin: 'Kotlin 代码',
+  swift: 'Swift 代码',
+  python: 'Python 代码',
+  py: 'Python 代码',
+  go: 'Go 代码',
+  rust: 'Rust 代码',
+  sql: 'SQL 代码',
+  json: 'JSON 数据',
+  xml: 'XML 配置',
+  yaml: 'YAML 配置',
+  yml: 'YAML 配置',
+  bash: 'Bash 脚本',
+  shell: 'Shell 脚本',
+  sh: 'Shell 脚本',
+  html: 'HTML 代码',
+  css: 'CSS 代码',
+  vue: 'Vue 代码',
+  text: '代码示例',
+  plaintext: '代码示例'
+}
 
 const props = defineProps<{
   prompt: string
@@ -35,6 +74,96 @@ const sleep = (ms: number, signal?: AbortSignal) =>
     })
   })
 
+// 移除 AI 响应中常见的引导性词汇（如 "AI 输出结果："）
+const stripResponsePrefix = (value: string) =>
+  value
+    .replace(/^(?:AI\s*输出(?:结果|摘录)?|普通输出|输出结果|输出|结果)\s*[:：]\s*/i, '')
+    .trim()
+
+// 解析 Markdown 格式的响应内容，将其拆分为文本块、代码块和特殊告警
+const parseResponseContent = (value: string): { alerts: ResponseAlert[]; blocks: ResponseBlock[] } => {
+  const alerts: ResponseAlert[] = []
+  const blocks: ResponseBlock[] = []
+  const normalized = stripResponsePrefix(value)
+
+  if (!normalized) {
+    return { alerts, blocks }
+  }
+
+  const lines = normalized.split('\n')
+  const textBuffer: string[] = []
+  const codeBuffer: string[] = []
+  let inCode = false
+  let codeLanguage = ''
+
+  const flushText = () => {
+    const text = textBuffer.join('\n').trim()
+    if (text) {
+      blocks.push({ type: 'text', content: text })
+    }
+    textBuffer.length = 0
+  }
+
+  const flushCode = () => {
+    const code = codeBuffer.join('\n').replace(/\s+$/, '')
+    if (code) {
+      blocks.push({ type: 'code', content: code, language: codeLanguage || undefined })
+    }
+    codeBuffer.length = 0
+    codeLanguage = ''
+  }
+
+  for (const line of lines) {
+    const trimmed = line.trim()
+
+    if (!inCode) {
+      const codeStart = trimmed.match(/^```([a-zA-Z0-9_-]+)?\s*$/)
+      if (codeStart) {
+        flushText()
+        inCode = true
+        codeLanguage = codeStart[1] || ''
+        continue
+      }
+
+      const issueMatch = line.match(/^\s*问题\s*[:：]\s*(.+)\s*$/)
+      if (issueMatch) {
+        flushText()
+        alerts.push({
+          label: '问题说明',
+          content: issueMatch[1].trim()
+        })
+        continue
+      }
+    } else if (/^```\s*$/.test(trimmed)) {
+      flushCode()
+      inCode = false
+      continue
+    }
+
+    if (inCode) {
+      codeBuffer.push(line)
+    } else {
+      textBuffer.push(line)
+    }
+  }
+
+  if (inCode) {
+    flushCode()
+  } else {
+    flushText()
+  }
+
+  return { alerts, blocks }
+}
+
+const getCodeBlockLabel = (language?: string) => {
+  const normalized = language?.trim().toLowerCase()
+  if (!normalized) return '代码示例'
+  return LANGUAGE_LABELS[normalized] || `${normalized.toUpperCase()} 代码`
+}
+
+// 从原始响应中提取“思考过程”部分
+// 支持通过特定标记（如“步骤 1”、“分析 1”）识别思考开始，以及通过“结论”、“总结”识别思考结束
 const processedThinking = computed(() => {
   if (props.thinkingText) return props.thinkingText
 
@@ -76,9 +205,10 @@ const processedThinking = computed(() => {
   return ''
 })
 
+// 从原始响应中提取“实际回答”部分
 const processedResponse = computed(() => {
   const thinking = processedThinking.value
-  if (!thinking) return props.response
+  if (!thinking) return stripResponsePrefix(props.response)
 
   // Finding the split point again to be precise
   const conclusionMarkers = [
@@ -89,17 +219,47 @@ const processedResponse = computed(() => {
   const match = props.response.match(regex)
 
   if (match && match.index !== undefined) {
-    return props.response.slice(match.index).trim()
+    return stripResponsePrefix(props.response.slice(match.index).trim())
   }
 
   // Fallback split if we used the splitRegex
   const splitRegex = /\n\n(?=\*\*|选择|建议|因此)/
   const splitMatch = props.response.match(splitRegex)
   if (splitMatch && splitMatch.index !== undefined) {
-    return props.response.slice(splitMatch.index).trim()
+    return stripResponsePrefix(props.response.slice(splitMatch.index).trim())
   }
 
-  return props.response.slice(thinking.length).trim()
+  return stripResponsePrefix(props.response.slice(thinking.length).trim())
+})
+
+const parsedVisibleResponse = computed(() => parseResponseContent(visibleResponse.value))
+const responseBlocks = computed(() => parsedVisibleResponse.value.blocks)
+const responseAlerts = computed(() => parsedVisibleResponse.value.alerts)
+const lastResponseBlock = computed(() => responseBlocks.value[responseBlocks.value.length - 1])
+
+// 思考状态 UI 显示逻辑
+const showThinkingState = computed(() => {
+  return Boolean(processedThinking.value || visibleThinking.value || isThinking.value || hasFinishedThinking.value)
+})
+
+// 思考状态的文本标签
+const thinkingStatusLabel = computed(() => {
+  if (isThinking.value) return '深度思考中'
+  if (hasFinishedThinking.value) return '深度思考完成'
+  return '深度思考'
+})
+
+// 思考指示灯的 CSS 类名
+const thinkingIndicatorClass = computed(() => {
+  if (isThinking.value) {
+    return 'thinking-led thinking-led--active'
+  }
+
+  if (hasFinishedThinking.value) {
+    return 'thinking-led thinking-led--done'
+  }
+
+  return 'thinking-led thinking-led--idle'
 })
 
 const startStreaming = async (signal: AbortSignal) => {
@@ -117,17 +277,11 @@ const startStreaming = async (signal: AbortSignal) => {
 
     await sleep(400, signal)
     showPrompt.value = true
-
-    isTyping.value = true
-    for (let i = 0; i <= props.prompt.length; i++) {
-      visiblePrompt.value = props.prompt.slice(0, i)
-      await sleep(15 + Math.random() * 10, signal)
-    }
-    isTyping.value = false
+    visiblePrompt.value = props.prompt
 
     // Only proceed to AI section if response is provided
     if (props.response && props.response.trim()) {
-      await sleep(800, signal)
+      await sleep(600, signal)
       showAiSection.value = true
       isThinking.value = true
 
@@ -171,6 +325,67 @@ const toggleThinking = () => {
 
 let observer: MutationObserver | null = null
 const rootEl = ref<HTMLElement | null>(null)
+const thinkingScrollEl = ref<HTMLElement | null>(null)
+const responseScrollEl = ref<HTMLElement | null>(null)
+let autoScrollFrame: number | null = null
+
+// 将元素滚动到底部
+const scrollElementToBottom = (el: HTMLElement | null) => {
+  if (!el) return
+  el.scrollTop = el.scrollHeight
+}
+
+// 寻找最近的具有滚动能力的父元素
+const findScrollableParent = (el: HTMLElement | null): HTMLElement | null => {
+  let node = el?.parentElement ?? null
+
+  while (node) {
+    if (node.classList.contains('custom-scrollbar-chat')) {
+      return node
+    }
+
+    const style = window.getComputedStyle(node)
+    const isScrollable = /(auto|scroll)/.test(style.overflowY) && node.scrollHeight > node.clientHeight
+    if (isScrollable) {
+      return node
+    }
+
+    node = node.parentElement
+  }
+
+  return null
+}
+
+// 确保当前正在打字或显示的消息始终在可见区域内
+const keepCurrentMessageInView = () => {
+  const root = rootEl.value
+  const parent = findScrollableParent(root)
+
+  if (!root || !parent) return
+
+  const rootRect = root.getBoundingClientRect()
+  const parentRect = parent.getBoundingClientRect()
+  const overflowBottom = rootRect.bottom - parentRect.bottom
+  const overflowTop = rootRect.top - parentRect.top
+
+  if (overflowBottom > -12) {
+    parent.scrollTop += overflowBottom + 20
+  } else if (overflowTop < 12) {
+    parent.scrollTop += overflowTop - 20
+  }
+}
+
+// 安排一次自动滚动（使用 requestAnimationFrame 以优化性能）
+const queueAutoScroll = () => {
+  if (autoScrollFrame !== null) return
+
+  autoScrollFrame = window.requestAnimationFrame(() => {
+    autoScrollFrame = null
+    scrollElementToBottom(thinkingScrollEl.value)
+    scrollElementToBottom(responseScrollEl.value)
+    keepCurrentMessageInView()
+  })
+}
 
 const findSection = (el: HTMLElement | null): HTMLElement | null => {
   let node = el
@@ -196,6 +411,14 @@ const checkIfPresent = () => {
   }
 }
 
+watch(
+  [visiblePrompt, visibleThinking, visibleResponse, showAiSection, isThinkingCollapsed, hasFinishedThinking],
+  () => {
+    queueAutoScroll()
+  },
+  { flush: 'post' }
+)
+
 onMounted(() => {
   const section = findSection(rootEl.value)
   if (!section) return
@@ -207,6 +430,9 @@ onMounted(() => {
 onBeforeUnmount(() => {
   abortController?.abort()
   observer?.disconnect()
+  if (autoScrollFrame !== null) {
+    window.cancelAnimationFrame(autoScrollFrame)
+  }
 })
 </script>
 
@@ -241,8 +467,8 @@ onBeforeUnmount(() => {
             />
           </svg>
         </div>
-        <span class="text-[11px] font-black uppercase tracking-[0.15em] text-blue-900/60">
-          {{ promptLabel || 'PROMPT' }}
+        <span class="text-[11px] font-black tracking-[0.12em] text-blue-900/60">
+          {{ promptLabel || 'Prompt' }}
         </span>
       </div>
 
@@ -253,10 +479,7 @@ onBeforeUnmount(() => {
         ]"
       >
         <p class="text-[14px] leading-[1.65] text-slate-800 font-mono whitespace-pre-wrap">
-          {{ visiblePrompt }}<span
-            v-if="isTyping && !showAiSection"
-            class="typing-cursor ml-0.5"
-          />
+          {{ visiblePrompt }}
         </p>
       </div>
     </div>
@@ -268,83 +491,50 @@ onBeforeUnmount(() => {
     >
       <div class="message-header flex items-center justify-between mb-3 px-1">
         <div class="flex items-center gap-2.5">
-          <div class="ai-avatar w-8 h-8 rounded-xl bg-[#000000] border border-white/10 flex items-center justify-center shadow-lg overflow-hidden shrink-0">
+          <div class="ai-avatar w-8 h-8 rounded-xl bg-white border border-slate-900/10 flex items-center justify-center shadow-lg overflow-hidden shrink-0">
             <svg
               viewBox="0 0 24 24"
-              class="w-[20px] h-[20px] text-white fill-current"
+              class="w-[18px] h-[18px] text-black fill-current"
               xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
             >
-              <path d="M22.28 9.82a6.01 6.01 0 0 0-.52-4.91 6.04 6.04 0 0 0-4.45-3.21A6.015 6.015 0 0 0 9.63 5.7a6.056 6.056 0 0 0-7.53 5.83c0 2.21 1.25 4.13 3.1 5.09a6.007 6.007 0 0 0 4.23 5.21c1.65.6 3.5.38 4.93-.52a6.05 6.05 0 0 0 5.1 2.93c2.25 0 4.19-1.3 5.11-3.11a6.01 6.01 0 0 0 3.15-7.44 5.992 5.992 0 0 0 3.018-7.382v.002ZM18.78 19.34a4.265 4.265 0 0 1-5.74-2.15l-1.4 2.43a.125.125 0 0 1-.22 0l-4.23-7.34l.11-.06l4.23 7.34a.125.125 0 0 1 0 .22l-1.42 2.46a4.256 4.256 0 1 1-1.35-6.19l4.47-2.58a.125.125 0 0 1 .19.11l-.001 4.87l.13.07l-.001-4.87a.125.125 0 0 1 .19-.11l1.42 1.96a4.256 4.256 0 1 1 3.85 6.35" />
+              <path d="M9.205 8.658v-2.26c0-.19.072-.333.238-.428l4.543-2.616c.619-.357 1.356-.523 2.117-.523 2.854 0 4.662 2.212 4.662 4.566 0 .167 0 .357-.024.547l-4.71-2.759a.797.797 0 0 0-.856 0l-5.97 3.473zm10.609 8.8V12.06c0-.333-.143-.57-.429-.737l-5.97-3.473 1.95-1.118a.433.433 0 0 1 .476 0l4.543 2.617c1.309.76 2.189 2.378 2.189 3.948 0 1.808-1.07 3.473-2.76 4.163zM7.802 12.703l-1.95-1.142c-.167-.095-.239-.238-.239-.428V5.899c0-2.545 1.95-4.472 4.591-4.472 1 0 1.927.333 2.712.928L8.23 5.067c-.285.166-.428.404-.428.737v6.898zM12 15.128l-2.795-1.57v-3.33L12 8.658l2.795 1.57v3.33L12 15.128zm1.796 7.23c-1 0-1.927-.332-2.712-.927l4.686-2.712c.285-.166.428-.404.428-.737v-6.898l1.974 1.142c.167.095.238.238.238.428v5.233c0 2.545-1.974 4.472-4.614 4.472zm-5.637-5.303l-4.544-2.617c-1.308-.761-2.188-2.378-2.188-3.948A4.482 4.482 0 0 1 4.21 6.327v5.423c0 .333.143.571.428.738l5.947 3.449-1.95 1.118a.432.432 0 0 1-.476 0zm-.262 3.9c-2.688 0-4.662-2.021-4.662-4.519 0-.19.024-.38.047-.57l4.686 2.71c.286.167.571.167.856 0l5.97-3.448v2.26c0 .19-.07.333-.237.428l-4.543 2.616c-.619.357-1.356.523-2.117.523zm5.899 2.83a5.947 5.947 0 0 0 5.827-4.756C22.287 18.339 24 15.84 24 13.296c0-1.665-.713-3.282-1.998-4.448.119-.5.19-.999.19-1.498 0-3.401-2.759-5.947-5.946-5.947-.642 0-1.26.095-1.88.31A5.962 5.962 0 0 0 10.205 0a5.947 5.947 0 0 0-5.827 4.757C1.713 5.447 0 7.945 0 10.49c0 1.666.713 3.283 1.998 4.448-.119.5-.19 1-.19 1.499 0 3.401 2.759 5.946 5.946 5.946.642 0 1.26-.095 1.88-.309a5.96 5.96 0 0 0 4.162 1.713z" />
             </svg>
           </div>
           <span
-            class="text-[11px] font-black uppercase tracking-[0.15em]"
+            class="text-[11px] font-black tracking-[0.12em]"
             :class="variant === 'error' ? 'text-red-900/60' : 'text-slate-500'"
           >
             {{ responseLabel || 'AI 输出' }}
           </span>
-        </div>
-        <div
-          v-if="isThinking || visibleThinking"
-          class="thinking-chip px-3 py-1 rounded-full bg-slate-50/80 backdrop-blur-sm border border-slate-200/50 flex items-center gap-2 shadow-sm transition-all duration-300 transform active:scale-95 cursor-pointer hover:bg-white select-none"
-          :class="{ 'bg-blue-50/80 border-blue-100/50': !hasFinishedThinking }"
-          @click="toggleThinking"
-        >
-          <div class="flex items-center gap-1.5 min-w-0">
-            <div
-              v-if="!hasFinishedThinking"
-              class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse shrink-0"
-            />
-            <svg
-              v-else
-              class="w-3.5 h-3.5 text-blue-500/80 shrink-0"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            </svg>
-            <span class="text-[11px] font-bold text-slate-600 truncate">
-              {{ hasFinishedThinking ? '✓ 思考已完成' : '深度思考中...' }}
-            </span>
-          </div>
         </div>
       </div>
 
       <div class="message-content-wrapper flex flex-col gap-3 min-h-0">
         <!-- Collapsible Thinking Block -->
         <div
-          v-if="visibleThinking"
-          class="thinking-block shrink-0 overflow-hidden transition-all duration-300 ease-in-out"
-          :class="isThinkingCollapsed ? 'max-h-12' : 'max-h-[300px]'"
+          v-if="showThinkingState"
+          class="thinking-block shrink-0"
         >
           <div
-            class="group relative flex flex-col gap-2 p-3 rounded-2xl bg-slate-100/50 border border-slate-200/40 cursor-pointer hover:bg-slate-200/50 transition-all font-mono"
+            class="group relative flex flex-col gap-1.5 px-4 py-2.5 rounded-[18px] bg-slate-100/55 border border-slate-200/50 cursor-pointer hover:bg-slate-200/55 transition-all font-mono"
+            :class="isThinkingCollapsed ? 'min-h-[40px]' : 'max-h-[220px]'"
+            :aria-expanded="!isThinkingCollapsed"
             @click="toggleThinking"
           >
-            <div class="flex items-center justify-between text-slate-400">
-              <div class="flex items-center gap-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="w-3 h-3"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="3"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                </svg>
-                <span class="text-[10px] font-bold uppercase tracking-widest">{{ isThinkingCollapsed ? '显示思考过程' : '收起思考过程' }}</span>
+            <div class="flex min-h-[18px] items-center justify-between text-slate-400">
+              <div class="flex min-w-0 items-center gap-2">
+                <span
+                  :class="thinkingIndicatorClass"
+                  aria-hidden="true"
+                />
+                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500 truncate">
+                  {{ thinkingStatusLabel }}
+                </span>
               </div>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="w-3 h-3 transition-transform"
+                class="w-3 h-3 transition-transform shrink-0"
                 :class="{ 'rotate-180': !isThinkingCollapsed }"
                 viewBox="0 0 24 24"
                 fill="none"
@@ -352,27 +542,109 @@ onBeforeUnmount(() => {
                 stroke-width="3"
                 stroke-linecap="round"
                 stroke-linejoin="round"
+                aria-hidden="true"
               >
                 <path d="m6 9 6 6 6-6" />
               </svg>
             </div>
             <div
-              class="text-[12px] leading-relaxed text-slate-500 italic whitespace-pre-wrap overflow-hidden"
-              :class="{ 'line-clamp-1': isThinkingCollapsed }"
+              v-if="!isThinkingCollapsed && visibleThinking"
+              ref="thinkingScrollEl"
+              class="text-[12px] leading-relaxed text-slate-500 italic whitespace-pre-wrap overflow-auto custom-scrollbar"
             >
               {{ visibleThinking }}
             </div>
           </div>
         </div>
 
+        <div
+          v-for="(alert, index) in responseAlerts"
+          :key="`${alert.label}-${index}-${alert.content}`"
+          class="response-alert shrink-0 flex items-start gap-3 rounded-[18px] border border-amber-200/80 bg-amber-50/80 px-4 py-3.5 shadow-sm"
+        >
+          <div class="response-alert__icon mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.4"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+              <path d="M12 9v4" />
+              <path d="M12 17h.01" />
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <p class="text-[10px] font-black uppercase tracking-[0.16em] text-amber-700/80">
+              {{ alert.label }}
+            </p>
+            <p class="mt-1 text-[13px] leading-[1.65] text-slate-700 whitespace-pre-wrap">
+              {{ alert.content }}
+            </p>
+          </div>
+        </div>
+
         <!-- Main Response Block -->
-        <div class="main-response flex-1 bg-white/60 backdrop-blur-md rounded-[20px] p-5 border border-white/80 shadow-sm min-h-[60px] relative overflow-auto custom-scrollbar">
-          <p class="text-[14px] leading-[1.7] text-slate-800 font-mono whitespace-pre-wrap">
-            {{ visibleResponse }}<span
-              v-if="!isComplete && (visibleResponse || !isThinking)"
-              class="typing-cursor ml-0.5"
-            />
-          </p>
+        <div
+          ref="responseScrollEl"
+          class="main-response flex-1 bg-white/60 backdrop-blur-md rounded-[20px] p-5 border border-white/80 shadow-sm min-h-[60px] relative overflow-auto custom-scrollbar"
+        >
+          <div class="flex flex-col gap-3">
+            <template
+              v-for="(block, index) in responseBlocks"
+              :key="`${block.type}-${index}`"
+            >
+              <div
+                v-if="block.type === 'code'"
+                class="response-code-shell overflow-hidden rounded-[18px] border border-slate-200 bg-slate-950 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+              >
+                <div class="response-code-header flex items-center justify-between border-b border-white/10 bg-slate-900/90 px-4 py-2.5">
+                  <div class="flex items-center gap-2">
+                    <span class="h-2 w-2 rounded-full bg-rose-400" />
+                    <span class="h-2 w-2 rounded-full bg-amber-400" />
+                    <span class="h-2 w-2 rounded-full bg-emerald-400" />
+                  </div>
+                  <span class="text-[11px] font-bold tracking-[0.08em] text-slate-300">
+                    {{ getCodeBlockLabel(block.language) }}
+                  </span>
+                  <span class="w-8 shrink-0" />
+                </div>
+                <div class="response-code-block overflow-x-auto px-4 py-3.5">
+                  <code class="block text-[13px] leading-[1.65] text-slate-100 font-mono whitespace-pre">{{ block.content }}</code>
+                </div>
+              </div>
+
+              <p
+                v-else
+                class="text-[14px] leading-[1.7] text-slate-800 font-mono whitespace-pre-wrap"
+              >
+                {{ block.content }}<span
+                  v-if="!isComplete && lastResponseBlock?.type === 'text' && index === responseBlocks.length - 1"
+                  class="typing-cursor ml-0.5"
+                />
+              </p>
+            </template>
+
+            <p
+              v-if="!responseBlocks.length && !isComplete && (visibleResponse || !isThinking)"
+              class="text-[14px] leading-[1.7] text-slate-800 font-mono whitespace-pre-wrap"
+            >
+              <span class="typing-cursor ml-0.5" />
+            </p>
+
+            <div
+              v-if="!isComplete && lastResponseBlock?.type === 'code'"
+              class="text-slate-700"
+            >
+              <span class="typing-cursor ml-0.5" />
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -437,5 +709,55 @@ onBeforeUnmount(() => {
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.1);
+}
+
+.response-code-block::-webkit-scrollbar {
+  height: 6px;
+}
+
+.response-code-block::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.response-code-block::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 9999px;
+}
+
+.response-code-block::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.55);
+}
+
+.thinking-led {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+  transition: background-color 220ms ease, opacity 220ms ease, transform 220ms ease;
+}
+
+.thinking-led--idle {
+  background: #cbd5e1;
+  opacity: 0.9;
+}
+
+.thinking-led--active {
+  background: #3b82f6;
+  animation: thinking-led-pulse 1.4s ease-in-out infinite;
+}
+
+.thinking-led--done {
+  background: #22c55e;
+}
+
+@keyframes thinking-led-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.72;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
 }
 </style>

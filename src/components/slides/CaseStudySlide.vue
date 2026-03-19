@@ -10,10 +10,10 @@ const props = defineProps<{
   slide: CaseStudySlideDefinition
 }>()
 
-const isApeCorrected = ref(false)
-const layout = computed(() => props.slide.variant ?? 'compare')
-const examplePairs = computed(() => props.slide.payload.examplePairs ?? [])
-const { motion } = useSlideMotion(toRef(props, 'slide'))
+const isApeCorrected = ref(false) // 是否显示 APE 优化后的内容
+const layout = computed(() => props.slide.variant ?? 'compare') // 幻灯片布局变体
+const examplePairs = computed(() => props.slide.payload.examplePairs ?? []) // 示例对比组
+const { motion } = useSlideMotion(toRef(props, 'slide')) // 动画控制
 
 const isOutputLabel = (label: string | undefined) => {
   if (!label) return false
@@ -21,6 +21,7 @@ const isOutputLabel = (label: string | undefined) => {
   return /AI|输出|结果|结论|回答|推理|决策|模拟|展示|ToT|RAG|Ans|Prop|Refiner/i.test(l)
 }
 
+// 解析混合了 Prompt 和 Response 的字符串（旧版数据格式支持）
 const parseCombined = (str: string | undefined) => {
   if (!str) return null
   const cleanStr = str
@@ -43,6 +44,11 @@ const parseCombined = (str: string | undefined) => {
   return { prompt: cleanStr, response: '' }
 }
 
+const normalizePromptHeader = () => 'Prompt'
+
+const normalizeResponseHeader = () => 'AI 输出'
+
+// 构建聊天项目列表，处理单轮对话、多轮对话以及旧版数据的兼容
 const chatItems = computed(() => {
   const payload = props.slide.payload
   const items: Array<{
@@ -70,8 +76,8 @@ const chatItems = computed(() => {
     items.push({
       prompt: payload.beforePrompt.trim(),
       response: (payload.afterResponse || payload.beforeResponse || payload.afterPrompt || '').trim(),
-      label: payload.beforeLabel || 'Prompt',
-      responseLabel: payload.afterLabel || (payload.afterResponse ? 'AI 输出' : 'AI Response')
+      label: normalizePromptHeader(),
+      responseLabel: normalizeResponseHeader()
     })
   } else {
     // Legacy / Split Prompt-Response in same field case
@@ -101,6 +107,34 @@ const chatItems = computed(() => {
 
   return items
 })
+
+// 在 Manifesto 布局中，判断是否需要显示“优化前/后”的切换开关
+const manifestoUsesToggle = computed(() => {
+  const payload = props.slide.payload
+  return Boolean(payload.beforePrompt?.trim() && payload.afterPrompt?.trim())
+})
+
+// 获取当前 Manifesto 布局应显示的聊天内容
+const manifestoChatItem = computed(() => {
+  if (manifestoUsesToggle.value) {
+    return {
+      prompt: isApeCorrected.value
+        ? (props.slide.payload.afterPrompt || '')
+        : (props.slide.payload.beforePrompt || ''),
+      response: isApeCorrected.value
+        ? (props.slide.payload.afterResponse || '')
+        : (props.slide.payload.beforeResponse || '')
+    }
+  }
+
+  const [firstItem] = chatItems.value
+  return {
+    prompt: firstItem?.prompt || props.slide.payload.beforePrompt || '',
+    response: firstItem?.response || props.slide.payload.afterResponse || props.slide.payload.beforeResponse || ''
+  }
+})
+
+// 根据标签文本自动映射相应的图标
 const labelToIcon = (label: string | undefined): string => {
   if (!label) return 'alert'
   if (label.includes('核心逻辑') || label.includes('核心心法') || label.includes('核心策略')) return 'tech'
@@ -237,6 +271,7 @@ const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.
 
           <!-- Toggle Switch -->
           <div
+            v-if="manifestoUsesToggle"
             class="ape-toggle flex items-center rounded-full border p-0.5 cursor-pointer select-none transition-all duration-300"
             :class="isApeCorrected
               ? 'bg-emerald-50 border-emerald-200'
@@ -260,18 +295,28 @@ const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.
               {{ slide.payload.afterLabel || 'APE 优化' }}
             </span>
           </div>
+
+          <div
+            v-else
+            class="flex items-center gap-2 text-[11px] font-bold"
+          >
+            <span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-slate-500">
+              {{ slide.payload.beforeLabel || 'Prompt' }}
+            </span>
+            <span class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-emerald-700">
+              {{ slide.payload.afterLabel || 'AI 输出' }}
+            </span>
+          </div>
         </div>
 
         <!-- Scrollable chat content (FULL HEIGHT) -->
         <div class="flex-1 min-h-0 overflow-auto px-6 py-5 custom-scrollbar-chat">
           <StreamingChat
-            :key="isApeCorrected ? 'ape-opt' : 'ape-raw'"
-            :prompt="isApeCorrected
-              ? (slide.payload.afterPrompt || '')
-              : (slide.payload.beforePrompt || '')"
-            :response="isApeCorrected
-              ? (slide.payload.afterResponse || '')
-              : (slide.payload.beforeResponse || '')"
+            :key="manifestoUsesToggle
+              ? (isApeCorrected ? 'manifesto-opt' : 'manifesto-raw')
+              : 'manifesto-single'"
+            :prompt="manifestoChatItem.prompt"
+            :response="manifestoChatItem.response"
             compact
             auto-start
           />
@@ -642,8 +687,8 @@ const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.
         v-bind="motion('chat')"
       >
         <template
-          v-for="(item, idx) in chatItems"
-          :key="idx"
+          v-for="item in chatItems"
+          :key="item.prompt"
         >
           <div class="chat-item shrink-0">
             <StreamingChat
@@ -663,7 +708,7 @@ const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.
     <!-- ════════════════════════════════════════════════════════ -->
     <div
       v-else-if="layout === 'dossier'"
-      class="grid h-full min-h-0 grid-cols-[1.04fr_0.96fr] gap-4"
+      class="grid h-full min-h-0 grid-cols-[0.96fr_1.04fr] gap-4"
     >
       <div class="grid min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] gap-3.5">
         <div
@@ -684,48 +729,29 @@ const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.
           </p>
         </div>
         <div
-          class="min-h-0 flex-1 flex flex-col gap-4 overflow-auto pr-1 custom-scrollbar-chat"
-          v-bind="motion('chat')"
-        >
-          <template
-            v-for="(item, idx) in chatItems"
-            :key="idx"
-          >
-            <div class="chat-item shrink-0">
-              <StreamingChat
-                :prompt="item.prompt"
-                :response="item.response"
-                :prompt-label="item.label"
-                :response-label="item.responseLabel"
-                :variant="idx === 0 && chatItems.length > 1 ? 'error' : 'default'"
-                auto-start
-              />
-            </div>
-          </template>
-        </div>
-      </div>
-      <div class="grid min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] gap-3.5">
-        <div
-          class="rounded-[22px] border border-slate-200/70 bg-white/70 p-5 shadow-sm backdrop-blur-sm"
+          class="min-h-0 flex flex-col rounded-[22px] border border-slate-200/70 bg-white/70 p-5 shadow-sm backdrop-blur-sm overflow-hidden"
           v-bind="motion('rail')"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="13"
-            height="13"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="text-rose-500"
-          >
-            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
-            <path d="M12 9v4" />
-            <path d="M12 17h.01" />
-          </svg>
-          <ul class="space-y-2">
+          <p class="slide-label mb-4 flex items-center gap-2 text-slate-500">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="text-rose-500"
+            >
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+              <path d="M12 9v4" />
+              <path d="M12 17h.01" />
+            </svg>
+            {{ slide.payload.challengeLabel ?? 'Key Mechanisms' }}
+          </p>
+          <ul class="space-y-2 overflow-auto pr-1 custom-scrollbar flex-1">
             <li
               v-for="item in slide.payload.challenge"
               :key="item"
@@ -735,26 +761,6 @@ const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.
             </li>
           </ul>
         </div>
-        <div
-          v-if="examplePairs.length"
-          class="grid gap-3"
-          v-bind="motion('card')"
-        >
-          <CorrectionCard
-            v-for="pair in examplePairs"
-            :key="pair.title"
-            :before="pair.before"
-            :before-response="pair.beforeResponse"
-            :after="pair.after"
-            :after-response="pair.afterResponse"
-            :title="pair.title || ''"
-            compact
-          />
-        </div>
-        <div
-          v-else
-          class="flex-1"
-        />
         <div
           class="slide-quote-card shrink-0 px-5 py-4 bg-amber-50/60 border-amber-200/50"
           v-bind="motion('quote')"
@@ -788,6 +794,42 @@ const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.
               {{ item }}
             </li>
           </ul>
+        </div>
+      </div>
+      <div
+        class="min-h-0 flex flex-col gap-4 overflow-auto pr-1 custom-scrollbar-chat"
+        v-bind="motion('chat')"
+      >
+        <template
+          v-for="(item, idx) in chatItems"
+          :key="item.prompt"
+        >
+          <div class="chat-item shrink-0">
+            <StreamingChat
+              :prompt="item.prompt"
+              :response="item.response"
+              :prompt-label="item.label"
+              :response-label="item.responseLabel"
+              :variant="idx === 0 && chatItems.length > 1 ? 'error' : 'default'"
+              auto-start
+            />
+          </div>
+        </template>
+        <div
+          v-if="examplePairs.length"
+          class="grid gap-3"
+          v-bind="motion('card')"
+        >
+          <CorrectionCard
+            v-for="pair in examplePairs"
+            :key="pair.title"
+            :before="pair.before"
+            :before-response="pair.beforeResponse"
+            :after="pair.after"
+            :after-response="pair.afterResponse"
+            :title="pair.title || ''"
+            compact
+          />
         </div>
       </div>
     </div>
@@ -857,8 +899,8 @@ const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.
         v-bind="motion('chat')"
       >
         <template
-          v-for="(item, idx) in chatItems"
-          :key="idx"
+          v-for="item in chatItems"
+          :key="item.prompt"
         >
           <div class="chat-item shrink-0">
             <StreamingChat

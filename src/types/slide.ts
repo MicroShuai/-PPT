@@ -1,11 +1,11 @@
 export type SlideType
-  = 'cover'
-  | 'agenda'
-  | 'three-column'
-  | 'concept'
-  | 'case-study'
-  | 'flow'
-  | 'summary'
+    = 'cover'
+    | 'agenda'
+    | 'three-column'
+    | 'concept'
+    | 'case-study'
+    | 'flow'
+    | 'summary'
 
 export interface DeckMeta {
   title: string
@@ -107,6 +107,7 @@ export interface CaseStudyExamplePair {
   afterResponse?: string
 }
 
+// 案例学习幻灯片的数据载体
 export interface CaseStudySlidePayload {
   icon?: string
   scenarioLabel?: string
@@ -131,7 +132,12 @@ export interface CaseStudySlidePayload {
   }
 }
 
+// 流程图幻灯片的数据载体
 export interface FlowSlidePayload {
+  scenarioLabel?: string
+  scenario?: string
+  challengeLabel?: string
+  challenge?: string[]
   description: string
   mermaid?: string
   checkpoints?: string[]
@@ -181,10 +187,10 @@ export type FlowSlideDefinition = BaseSlideDefinition<'flow', FlowSlidePayload>
 export type SummarySlideDefinition = BaseSlideDefinition<'summary', SummarySlidePayload>
 
 export type AnySlideDefinition
-  = CoverSlideDefinition
-  | AgendaSlideDefinition
-  | ThreeColumnSlideDefinition
-  | ConceptSlideDefinition
-  | CaseStudySlideDefinition
-  | FlowSlideDefinition
-  | SummarySlideDefinition
+    = CoverSlideDefinition
+    | AgendaSlideDefinition
+    | ThreeColumnSlideDefinition
+    | ConceptSlideDefinition
+    | CaseStudySlideDefinition
+    | FlowSlideDefinition
+    | SummarySlideDefinition
