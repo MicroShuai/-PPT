@@ -18,7 +18,9 @@ export type MotionSlot =
   | 'diagram'
   | 'checkpoint'
   | 'footer'
-  | 'aside';
+  | 'aside'
+  | 'chat'
+  | 'list-item';
 
 export type ShellMotionSlot = 'eyebrow' | 'title' | 'subtitle';
 

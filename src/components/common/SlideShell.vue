@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { toRef } from 'vue';
-import { useSlideMotion } from '@/composables/useSlideMotion';
-import type { AnySlideDefinition } from '@/types/slide';
+import { toRef } from 'vue'
+import { useSlideMotion } from '@/composables/useSlideMotion'
+import type { AnySlideDefinition } from '@/types/slide'
 
 const props = withDefaults(
   defineProps<{
-    slide: AnySlideDefinition;
-    align?: 'start' | 'center';
+    slide: AnySlideDefinition
+    align?: 'start' | 'center'
   }>(),
   {
     align: 'start'
   }
-);
+)
 
-const { shellMotion } = useSlideMotion(toRef(props, 'slide'));
+const { shellMotion } = useSlideMotion(toRef(props, 'slide'))
 </script>
 
 <template>
@@ -21,16 +21,6 @@ const { shellMotion } = useSlideMotion(toRef(props, 'slide'));
     class="slide-shell"
     :class="slide.fullBleed ? 'slide-shell--full-bleed' : ''"
   >
-    <div
-      v-if="!slide.fullBleed"
-      class="pointer-events-none absolute inset-0"
-    >
-      <div class="absolute left-12 top-10 h-px w-36 bg-gradient-to-r from-blue-300/70 to-transparent" />
-      <div class="absolute right-12 top-10 h-px w-48 bg-gradient-to-l from-blue-200/70 to-transparent" />
-      <div class="absolute bottom-12 left-14 h-20 w-20 rounded-full border border-blue-100/80" />
-      <div class="absolute bottom-10 right-14 h-px w-56 bg-gradient-to-l from-slate-300/70 to-transparent" />
-    </div>
-
     <div
       class="slide-inner"
       :class="[
@@ -58,7 +48,7 @@ const { shellMotion } = useSlideMotion(toRef(props, 'slide'));
             {{ slide.title }}
           </h1>
           <p
-            v-if="slide.subtitle"
+            v-if="slide.subtitle && !['case-study', 'flow'].includes(slide.type)"
             class="slide-subtitle"
             v-bind="shellMotion('subtitle')"
           >

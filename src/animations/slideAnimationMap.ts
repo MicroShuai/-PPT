@@ -1,14 +1,14 @@
-import type { AnySlideDefinition } from '@/types/slide';
+import type { AnySlideDefinition } from '@/types/slide'
 import type {
   MotionRecipe,
   MotionSlot,
   ShellMotionSlot,
   SlideAnimationMap,
   SlideAnimationPreset
-} from '@/animations/types';
+} from '@/animations/types'
 
-const EASE_OUT = 'cubic-bezier(0.22, 1, 0.36, 1)';
-const EASE_SOFT = 'cubic-bezier(0.16, 1, 0.3, 1)';
+const EASE_OUT = 'cubic-bezier(0.22, 1, 0.36, 1)'
+const EASE_SOFT = 'cubic-bezier(0.16, 1, 0.3, 1)'
 
 function step(effect: MotionRecipe['effect'], order: number, overrides: Partial<MotionRecipe> = {}): MotionRecipe {
   return {
@@ -23,14 +23,14 @@ function step(effect: MotionRecipe['effect'], order: number, overrides: Partial<
     blur: 12,
     easing: EASE_OUT,
     ...overrides
-  };
+  }
 }
 
 const defaultShell: Record<ShellMotionSlot, MotionRecipe> = {
   eyebrow: step('rise', 0, { duration: 420, distanceY: 16, blur: 8 }),
   title: step('focus', 90, { duration: 680, distanceY: 22, scaleFrom: 0.972, blur: 16 }),
   subtitle: step('rise', 190, { duration: 560, distanceY: 20, blur: 10 })
-};
+}
 
 const defaultSlots: Record<MotionSlot, MotionRecipe> = {
   intro: step('rise', 260),
@@ -44,7 +44,7 @@ const defaultSlots: Record<MotionSlot, MotionRecipe> = {
   quote: step('focus', 640, { duration: 640, distanceY: 18, scaleFrom: 0.97, blur: 10 }),
   tag: step('rise', 520, { stagger: 40, duration: 400, distanceY: 10, blur: 6 }),
   rail: step('glide-left', 360, { stagger: 80, duration: 560, distanceX: -30, distanceY: 8, blur: 10 }),
-  code: step('soft-scale', 460, { stagger: 70, duration: 620, distanceY: 18, scaleFrom: 0.97, blur: 8 }),
+  code: step('soft-scale', 460, { stagger: 70, duration: 620, distanceY: 16, scaleFrom: 0.974, blur: 7 }),
   diagram: step('focus', 380, {
     duration: 820,
     distanceY: 18,
@@ -54,8 +54,10 @@ const defaultSlots: Record<MotionSlot, MotionRecipe> = {
   }),
   checkpoint: step('rise', 520, { stagger: 60, duration: 520, distanceY: 16, blur: 8 }),
   footer: step('rise', 700, { duration: 520, distanceY: 14, blur: 8 }),
-  aside: step('glide-right', 340, { duration: 620, distanceX: 28, distanceY: 10, blur: 10 })
-};
+  aside: step('glide-right', 340, { duration: 620, distanceX: 28, distanceY: 10, blur: 10 }),
+  chat: step('focus', 460, { duration: 800, distanceY: 20, scaleFrom: 0.96, blur: 15 }),
+  'list-item': step('rise', 400, { stagger: 60, duration: 500, distanceY: 12, blur: 6 })
+}
 
 export const slideAnimationMap: SlideAnimationMap = {
   cover: {
@@ -165,6 +167,15 @@ export const slideAnimationMap: SlideAnimationMap = {
           code: step('soft-scale', 490, { stagger: 70, duration: 600, distanceY: 14 }),
           quote: step('focus', 700, { duration: 560, distanceY: 12, blur: 8 }),
           card: step('rise', 740, { stagger: 45, duration: 420, distanceY: 10, blur: 5 })
+        }
+      },
+      'interactive-chat': {
+        id: 'case-study-interactive-chat',
+        slots: {
+          panel: step('focus', 260, { duration: 680, distanceY: 18, scaleFrom: 0.972 }),
+          rail: step('glide-left', 340, { stagger: 70, duration: 540, distanceX: -26, distanceY: 8 }),
+          chat: step('focus', 480, { duration: 820, distanceY: 20, scaleFrom: 0.965, blur: 12 }),
+          quote: step('rise', 660, { duration: 520, distanceY: 12, blur: 7 })
         }
       },
       workflow: {
@@ -299,29 +310,29 @@ export const slideAnimationMap: SlideAnimationMap = {
       footer: step('rise', 720, { duration: 420, distanceY: 10, blur: 5 })
     }
   }
-};
+}
 
 function mergeRecipes(
   base: Partial<Record<ShellMotionSlot | MotionSlot, MotionRecipe>> | undefined,
   override: Partial<Record<ShellMotionSlot | MotionSlot, MotionRecipe>> | undefined
 ): Partial<Record<ShellMotionSlot | MotionSlot, MotionRecipe>> | undefined {
   if (!base && !override) {
-    return undefined;
+    return undefined
   }
 
   return {
     ...base,
     ...override
-  };
+  }
 }
 
 export function resolveSlideAnimation(slide: AnySlideDefinition): SlideAnimationPreset {
-  const definition = slideAnimationMap[slide.type];
-  const override = slide.variant ? definition.variants?.[slide.variant] : undefined;
+  const definition = slideAnimationMap[slide.type]
+  const override = slide.variant ? definition.variants?.[slide.variant] : undefined
 
   return {
     id: override?.id ?? definition.id,
     shell: mergeRecipes(defaultShell, mergeRecipes(definition.shell, override?.shell)) as SlideAnimationPreset['shell'],
     slots: mergeRecipes(defaultSlots, mergeRecipes(definition.slots, override?.slots)) as SlideAnimationPreset['slots']
-  };
+  }
 }

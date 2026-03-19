@@ -1,5 +1,5 @@
-import rawDeck from './prompt-engineering-deck.json';
-import type { PresentationDeck } from '@/types/slide';
+import rawDeck from './prompt-engineering-deck.json'
+import type { PresentationDeck } from '@/types/slide'
 
 const slideVariantMap: Record<string, string> = {
   'cover-overview': 'hero',
@@ -13,13 +13,14 @@ const slideVariantMap: Record<string, string> = {
   'application-overview': 'spotlight',
   'ai-strengths': 'matrix',
   'prompt-value': 'matrix',
+  'ape': 'manifesto',
   'active-prompt': 'workflow',
-  'self-consistency': 'dossier',
+  'self-consistency': 'interactive-chat',
   'defense-depth': 'layers',
   'absolute-mode': 'manifesto',
-  'cot-transaction': 'compare',
+  'cot-transaction': 'interactive-chat',
   'rag': 'dossier',
-  'tree-of-thoughts': 'dossier',
+  'tree-of-thoughts': 'interactive-chat',
   'reflexion': 'dossier',
   'personal-assistant': 'workflow',
   'team-review': 'workflow',
@@ -29,15 +30,20 @@ const slideVariantMap: Record<string, string> = {
   'react': 'storyboard',
   'react-execution-map': 'diagram-only',
   'chapter-outline': 'diagram-only',
-  'summary-close': 'closing'
-};
+  'summary-close': 'closing',
+  'zero-shot': 'interactive-chat',
+  'few-shot': 'interactive-chat',
+  'cot': 'interactive-chat',
+  'meta-prompting': 'interactive-chat',
+  'generated-knowledge': 'interactive-chat'
+}
 
-const baseDeck = rawDeck as PresentationDeck;
+const baseDeck = rawDeck as PresentationDeck
 
 export const promptEngineeringDeck: PresentationDeck = {
   ...baseDeck,
-  slides: baseDeck.slides.map((slide) => ({
+  slides: baseDeck.slides.map(slide => ({
     ...slide,
-    variant: slideVariantMap[slide.id]
+    variant: slideVariantMap[slide.id] ?? slide.variant
   }))
-};
+}
