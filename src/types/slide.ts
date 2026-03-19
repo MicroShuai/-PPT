@@ -141,6 +141,30 @@ export interface FlowSlidePayload {
   challenge?: string[]
   takeawayLabel?: string
   tips?: string[]
+  runtimeSequence?: Array<{
+    type: 'user' | 'model' | 'tool' | 'final'
+    label: string
+    title: string
+    body?: string
+    codeBlock?: {
+      language?: string
+      label?: string
+      code: string
+    }
+    result?: {
+      title: string
+      language?: string
+      content: string
+    }
+  }>
+  runtimeChat?: Array<{
+    prompt: string
+    response: string
+    thinkingText?: string
+    promptLabel?: string
+    responseLabel?: string
+    variant?: 'default' | 'error' | 'success' | 'warning'
+  }>
   description: string
   mermaid?: string
   checkpoints?: string[]

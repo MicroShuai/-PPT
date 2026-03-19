@@ -10,7 +10,7 @@ const props = defineProps<{
   slide: CaseStudySlideDefinition
 }>()
 
-const isApeCorrected = ref(false) // 是否显示 APE 优化后的内容
+const isComparisonCorrected = ref(false) // 是否显示优化后的对照内容
 const layout = computed(() => props.slide.variant ?? 'compare') // 幻灯片布局变体
 const examplePairs = computed(() => props.slide.payload.examplePairs ?? []) // 示例对比组
 const { motion } = useSlideMotion(toRef(props, 'slide')) // 动画控制
@@ -114,14 +114,24 @@ const manifestoUsesToggle = computed(() => {
   return Boolean(payload.beforePrompt?.trim() && payload.afterPrompt?.trim())
 })
 
+const interactiveUsesToggle = computed(() => {
+  if (layout.value !== 'interactive-chat') return false
+  const payload = props.slide.payload
+  return Boolean(
+    payload.beforePrompt?.trim()
+    && payload.afterPrompt?.trim()
+    && (payload.beforeResponse?.trim() || payload.afterResponse?.trim())
+  )
+})
+
 // 获取当前 Manifesto 布局应显示的聊天内容
 const manifestoChatItem = computed(() => {
   if (manifestoUsesToggle.value) {
     return {
-      prompt: isApeCorrected.value
+      prompt: isComparisonCorrected.value
         ? (props.slide.payload.afterPrompt || '')
         : (props.slide.payload.beforePrompt || ''),
-      response: isApeCorrected.value
+      response: isComparisonCorrected.value
         ? (props.slide.payload.afterResponse || '')
         : (props.slide.payload.beforeResponse || '')
     }
@@ -134,12 +144,22 @@ const manifestoChatItem = computed(() => {
   }
 })
 
+const interactiveChatItem = computed(() => ({
+  prompt: isComparisonCorrected.value
+    ? (props.slide.payload.afterPrompt || '')
+    : (props.slide.payload.beforePrompt || ''),
+  response: isComparisonCorrected.value
+    ? (props.slide.payload.afterResponse || '')
+    : (props.slide.payload.beforeResponse || '')
+}))
+
 // 根据标签文本自动映射相应的图标
 const labelToIcon = (label: string | undefined): string => {
   if (!label) return 'alert'
   if (label.includes('核心逻辑') || label.includes('核心心法') || label.includes('核心策略')) return 'tech'
   if (label.includes('操作准则') || label.includes('核心准则') || label.includes('核心原则') || label.includes('实践建议') || label.includes('可落地做法')) return 'zap'
   if (label.includes('应用范式') || label.includes('应用方式') || label.includes('典型场景')) return 'path'
+  if (label.includes('概念') || label.includes('定位') || label.includes('定义')) return 'concept'
   if (label.includes('核心价值') || label.includes('核心优势') || label.includes('设计哲学') || label.includes('定义规范')) return 'shield'
   if (label.includes('实战点评') || label.includes('专家点评') || label.includes('Tips')) return 'wand'
   if (label.includes('决策维度') || label.includes('分支')) return 'branch'
@@ -271,14 +291,14 @@ const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.
 
           <div
             class="ape-toggle flex items-center rounded-full border p-0.5 cursor-pointer select-none transition-all duration-300"
-            :class="isApeCorrected
+            :class="isComparisonCorrected
               ? 'bg-emerald-50 border-emerald-200'
               : 'bg-slate-100 border-slate-200'"
-            @click="isApeCorrected = !isApeCorrected"
+            @click="isComparisonCorrected = !isComparisonCorrected"
           >
             <span
               class="px-3 py-1 rounded-full text-[11px] font-bold tracking-wide transition-all duration-300"
-              :class="!isApeCorrected
+              :class="!isComparisonCorrected
                 ? 'bg-white text-slate-700 shadow-sm'
                 : 'text-slate-400'"
             >
@@ -286,7 +306,7 @@ const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.
             </span>
             <span
               class="px-3 py-1 rounded-full text-[11px] font-bold tracking-wide transition-all duration-300"
-              :class="isApeCorrected
+              :class="isComparisonCorrected
                 ? 'bg-white text-emerald-700 shadow-sm'
                 : 'text-slate-400'"
             >
@@ -295,9 +315,9 @@ const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.
           </div>
         </div>
 
-        <div class="flex-1 min-h-0 overflow-auto px-6 py-5 custom-scrollbar-chat">
+        <div class="flex-1 min-h-0 overflow-auto px-6 pt-5 pb-7 custom-scrollbar-chat">
           <StreamingChat
-            :key="isApeCorrected ? 'manifesto-opt' : 'manifesto-raw'"
+            :key="isComparisonCorrected ? 'manifesto-opt' : 'manifesto-raw'"
             :prompt="manifestoChatItem.prompt"
             :response="manifestoChatItem.response"
             compact
@@ -680,6 +700,53 @@ const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.
       </div>
 
       <div
+        v-if="interactiveUsesToggle"
+        class="flex min-h-0 flex-col overflow-hidden rounded-[24px] border border-slate-200/60 bg-white/80 shadow-lg"
+        v-bind="motion('chat')"
+      >
+        <div class="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-3.5 shrink-0">
+          <span class="text-[13px] font-bold text-slate-700">
+            {{ slide.payload.panelTitle ?? `${slide.title} Prompt Evolution` }}
+          </span>
+
+          <div
+            class="ape-toggle flex items-center rounded-full border p-0.5 cursor-pointer select-none transition-all duration-300"
+            :class="isComparisonCorrected
+              ? 'bg-emerald-50 border-emerald-200'
+              : 'bg-slate-100 border-slate-200'"
+            @click="isComparisonCorrected = !isComparisonCorrected"
+          >
+            <span
+              class="px-3 py-1 rounded-full text-[11px] font-bold tracking-wide transition-all duration-300"
+              :class="!isComparisonCorrected
+                ? 'bg-white text-slate-700 shadow-sm'
+                : 'text-slate-400'"
+            >
+              {{ slide.payload.beforeLabel || '原始提示' }}
+            </span>
+            <span
+              class="px-3 py-1 rounded-full text-[11px] font-bold tracking-wide transition-all duration-300"
+              :class="isComparisonCorrected
+                ? 'bg-white text-emerald-700 shadow-sm'
+                : 'text-slate-400'"
+            >
+              {{ slide.payload.afterLabel || '优化提示' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="flex-1 min-h-0 overflow-auto px-6 pt-5 pb-7 custom-scrollbar-chat">
+          <StreamingChat
+            :key="isComparisonCorrected ? 'interactive-opt' : 'interactive-raw'"
+            :prompt="interactiveChatItem.prompt"
+            :response="interactiveChatItem.response"
+            auto-start
+          />
+        </div>
+      </div>
+
+      <div
+        v-else
         class="flex flex-col min-h-0 gap-4 overflow-auto pr-1 custom-scrollbar-chat"
         v-bind="motion('chat')"
       >

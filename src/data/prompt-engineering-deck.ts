@@ -14,7 +14,7 @@ const slideVariantMap: Record<string, string> = {
   'ai-strengths': 'matrix',
   'prompt-value': 'matrix',
   'ape': 'manifesto',
-  'active-prompt': 'workflow',
+  'active-prompt': 'interactive-chat',
   'self-consistency': 'interactive-chat',
   'defense-depth': 'layers',
   'absolute-mode': 'manifesto',

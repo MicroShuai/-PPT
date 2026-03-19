@@ -751,6 +751,75 @@
         "scenarioLabel": "TOOL LOOP",
         "scenario": "工具调用与后端闭环",
         "description": "你的程序每次拿到模型响应后，都要先检查它是不是 tool call；如果是，就执行工具并把结果重新发回模型。",
+        "runtimeSequence": [
+          {
+            "type": "user",
+            "label": "用户任务",
+            "title": "发起排查请求",
+            "body": "你是一个产线数据排查助手。当你需要获取实时数据或进行计算时，可以调用工具。\n\n可用工具：\n1. [查询数据库]：传入 SQL 语句，返回查询结果。\n2. [精确计算器]：传入数学表达式，返回精确结果。\n\n任务：排查批次 \"LOT-20260314\" 的物料损耗率是否超标（标准 < 2%）。"
+          },
+          {
+            "type": "model",
+            "label": "模型思考 / Tool Call",
+            "title": "先查数据库拿真实数据",
+            "body": "我需要先知道这个批次的领料总数和实际产出消耗数，不能凭空猜，先调用查询数据库工具。",
+            "codeBlock": {
+              "language": "json",
+              "label": "JSON",
+              "code": "{\n  \"tool_call\": {\n    \"name\": \"query_database\",\n    \"arguments\": {\n      \"sql\": \"SELECT total_issue, actual_consume FROM material_lot WHERE lot_no = 'LOT-20260314'\"\n    }\n  }\n}"
+            },
+            "result": {
+              "title": "工具返回结果",
+              "language": "json",
+              "content": "{\n  \"total_issue\": 1050,\n  \"actual_consume\": 1000\n}"
+            }
+          },
+          {
+            "type": "model",
+            "label": "模型继续推理 / Tool Call",
+            "title": "拿到数据库结果后继续调用计算器",
+            "body": "现在已经知道领料 1050、实际消耗 1000。下一步要精确计算损耗率：(1050 - 1000) / 1050。",
+            "codeBlock": {
+              "language": "json",
+              "label": "JSON",
+              "code": "{\n  \"tool_call\": {\n    \"name\": \"precise_calculator\",\n    \"arguments\": {\n      \"expression\": \"(1050 - 1000) / 1050\"\n    }\n  }\n}"
+            },
+            "result": {
+              "title": "工具返回结果",
+              "language": "json",
+              "content": "{\n  \"value\": 0.0476,\n  \"percent\": \"4.76%\"\n}"
+            }
+          },
+          {
+            "type": "final",
+            "label": "最终输出",
+            "title": "返回业务结论",
+            "body": "批次 LOT-20260314 的物料损耗率为 4.76%，已超过 2% 的标准值，存在超标异常。\n\n建议：优先排查该批次的领料记录、报工记录与损耗登记链路，确认是否存在重复领料、报工遗漏或统计口径异常。"
+          }
+        ],
+        "runtimeChat": [
+          {
+            "promptLabel": "用户任务",
+            "responseLabel": "模型判断 / Tool Call",
+            "prompt": "你是一个产线数据排查助手。当你需要获取实时数据或进行计算时，可以调用工具。\n\n可用工具：\n1. [查询数据库]：传入 SQL 语句，返回查询结果。\n2. [精确计算器]：传入数学表达式，返回精确结果。\n\n任务：排查批次 \"LOT-20260314\" 的物料损耗率是否超标（标准 < 2%）。",
+            "thinkingText": "先拿到真实数据，再决定是否需要计算。这个问题不能靠猜，第一步应该查询数据库。",
+            "response": "我需要先知道这个批次的领料总数和实际产出消耗数，先调用查询数据库工具。\n\n```json\n{\n  \"tool_call\": {\n    \"name\": \"query_database\",\n    \"arguments\": {\n      \"sql\": \"SELECT total_issue, actual_consume FROM material_lot WHERE lot_no = 'LOT-20260314'\"\n    }\n  }\n}\n```"
+          },
+          {
+            "promptLabel": "工具返回 · query_database",
+            "responseLabel": "模型继续推理 / Tool Call",
+            "prompt": "Observation:\n{\n  \"total_issue\": 1050,\n  \"actual_consume\": 1000\n}",
+            "thinkingText": "数据库结果已经拿到。接下来要计算损耗率：(1050 - 1000) / 1050，这一步需要交给精确计算器。",
+            "response": "已拿到批次真实数据：领料 1050，实际消耗 1000。继续调用计算器计算损耗率。\n\n```json\n{\n  \"tool_call\": {\n    \"name\": \"precise_calculator\",\n    \"arguments\": {\n      \"expression\": \"(1050 - 1000) / 1050\"\n    }\n  }\n}\n```"
+          },
+          {
+            "promptLabel": "工具返回 · precise_calculator",
+            "responseLabel": "最终输出",
+            "prompt": "Observation:\n0.0476 (4.76%)",
+            "thinkingText": "计算结果已经足够明确，只需要和阈值 2% 比较并给出结论。",
+            "response": "批次 LOT-20260314 的物料损耗率为 4.76%，已超过 2% 的标准值，存在超标异常。\n\n建议：优先排查该批次的领料记录、报工记录与损耗登记链路，确认是否存在重复领料、报工遗漏或统计口径异常。"
+          }
+        ],
         "challengeLabel": "后端处理链路",
         "challenge": [
           "用户发问题。",
@@ -818,25 +887,29 @@
       "eyebrow": "技术核心 11",
       "title": "APE",
       "variant": "interactive-chat",
-      "subtitle": "打败魔法的最好方式是魔法——用 AI 来优化 AI 的提示词。",
+      "subtitle": "先让 AI 帮你设计高质量提示词模板，再用模板稳定地产出结构化结果。",
       "payload": {
         "scenarioLabel": "TECHNIQUE",
         "scenario": "自动提示工程 (APE)",
-        "challengeLabel": "核心价值",
+        "panelTitle": "APE 提示词演进示例",
+        "challengeLabel": "概念定位",
         "challenge": [
-          "用性能更好的模型作为“优化器”生成提示词模板",
-          "解决“知道要什么，但写不清楚需求”的协作痛点",
-          "极大降低团队建立高质量提示词库的门槛与成本"
+          "把 AI 当成“提示词优化器”，不是直接要答案，而是先让它生成更强的 Prompt 模板",
+          "你提供任务目标、坏提示词和期望结果，模型负责反向推导更专业的表达方式",
+          "适合“知道想要什么结果，但不会把要求写清楚”的 PM、研发和测试协作场景"
         ],
-        "beforeLabel": "案例：帮我生成专业验收标准模板",
-        "beforePrompt": "我是一个项目经理，我想让大模型帮我根据“一句话需求”自动生成详尽的“研发提测验收标准”。\n请你扮演资深提示词工程师，帮我设计 3 个不同维度的优质提示词模板。",
-        "afterLabel": "AI 输出成果 (模板建议)",
-        "afterResponse": "模板 A：你是一名拥有 10 年经验的高级测试工程师。现在我有一个需求：[需求内容]。请输出结构化验收文档，包含：核心流程、3个异常流边界点、性能风险提示。严格按 Markdown 格式。",
-        "learningsLabel": "实战点评",
+        "beforeLabel": "普通提示（直接问）",
+        "beforePrompt": "帮我给这个需求写一下测试点。",
+        "beforeResponse": "可以从以下几个方面测试：\n1. 功能是否正常。\n2. 异常情况是否处理。\n3. 边界值是否覆盖。\n4. 性能和兼容性是否正常。\n\n例如：检查新增功能是否可用、输入为空是否报错、网络异常时是否提示用户、页面在不同环境下是否正常。\n\n问题：没有角色设定、没有输出格式、没有异常流约束，AI 往往只能给出发散且泛泛的结果。",
+        "afterLabel": "APE 提示（生成模板）",
+        "afterPrompt": "我是一个项目经理，我想让大模型帮我根据“一句话需求”自动生成详尽的“研发提测验收标准”。\n但是我不知道怎么写提示词才能让大模型输出最结构化、最专业的结果。\n\n请你扮演“资深提示词工程师（Prompt Engineer）”，帮我设计一个不同维度的优质提示词模板。\n要求：模板中必须包含[角色设定]、[背景]、[输出格式限制]以及[异常流考虑]。",
+        "afterResponse": "```markdown\n[角色设定]\n你是一名拥有 10 年经验的高级测试工程师。\n\n[背景]\n现在我有一个新需求：[此处填入一句话需求]。\n\n[输出格式限制]\n请为开发团队输出一份 Markdown 格式的结构化验收标准文档，至少包含：\n1. 核心正向业务流验收点\n2. 至少 3 个异常流 / 边界测试点\n3. 性能或安全风险提示\n\n[异常流考虑]\n请重点覆盖并发、网络中断、数据为空、权限不足等场景。\n```\n\n说明：同样是“想写测试点”，先让 AI 帮你设计专业提示词模板，后续生成结果会稳定得多。",
+        "learningsLabel": "金句总结",
         "learnings": [
-          "写不好提示词没关系。把终极目标告诉 AI，让它亲自教你怎么给它下指令。"
+          "写不好提示词没关系。把终极目标告诉 AI，让 AI 这个“原作者”亲自教你怎么给它下达指令。",
+          "APE 的关键不是多问一次，而是先把“怎么问”这件事也交给 AI 优化。"
         ],
-        "icon": "magic"
+        "icon": "concept"
       }
     },
     {
@@ -845,39 +918,42 @@
       "eyebrow": "技术核心 12",
       "title": "Active-Prompt",
       "variant": "interactive-chat",
-      "subtitle": "不盲目给示例，识别分歧点并人工精准刺激最难的部分。",
+      "subtitle": "Few-shot 的关键不是多给例子，而是先把最容易误判的边界样本找出来，再由人定向补课。",
       "payload": {
         "scenarioLabel": "TECHNIQUE",
         "scenario": "主动提示",
+        "panelTitle": "垃圾分类：Bad Prompt vs Good Prompt",
         "challengeLabel": "核心逻辑",
         "challenge": [
-          "优先处理 AI 最不确定、分歧最大的复杂场景",
-          "通过人工标注高难度示例，引导 AI 实现定向突破",
-          "核心价值在于用极少的人工标注换取极高的覆盖质量"
+          "普通 Few-shot 常给“特别明显”的简单例子，模型只能学会基础模式，学不会边界条件",
+          "Active-Prompt 先让 AI 暴露自己最拿不准、最容易算错的样本，再把人工标注优先投给这些高价值难题",
+          "Few-shot 的质量比数量更重要，真正决定效果的，是那些最容易误判的少数示例"
         ],
-        "beforeLabel": "案例：测试用例批量生成",
-        "beforePrompt": "先让 AI 找出最难建模的 3 个业务对象。\n要求：\n1. 说明每个对象为什么难。\n2. 指出最容易漏掉的边界场景。\n3. 按“对象 / 难点 / 风险”表格输出。",
-        "afterLabel": "阶段 2 + 3：人工补样本后再扩散",
-        "afterPrompt": "阶段 2：\n由资深开发补这 3 个对象的标准设计方案 / 标准测试用例。\n\n阶段 3：\n再让 AI 按同样标准生成其他测试用例。\n要求：\n1. 覆盖正常流、异常流、边界值。\n2. 输出格式必须与人工示例一致。\n3. 不要漏掉 Corner Cases。",
+        "beforeLabel": "Bad Prompt",
+        "beforePrompt": "请根据以下示例，判断“沾满油渍的披萨盒”属于什么垃圾。\n\n示例：\n- 废旧报纸 -> 可回收物\n- 干净塑料瓶 -> 可回收物\n- 吃剩的苹果核 -> 厨余垃圾\n\n测试：沾满油渍的披萨盒 -> ？",
+        "beforeResponse": "AI 输出：可回收物。\n\n为什么会错：\n- 模型只看到了“披萨盒的基础材质是纸”，于是直接套用了“报纸 = 可回收物”的简单模式。\n- 它没有学到真正关键的边界条件：一旦纸类被油污严重污染，就会失去回收价值。\n\n问题本质：给的示例太基础，教会了材质判断，却没有教会“污染后如何改判”。",
+        "afterLabel": "Good Prompt",
+        "afterPrompt": "请根据以下高难度易错示例，判断“沾满油渍的披萨盒”属于什么垃圾。\n\n这些示例来自 AI 先暴露出来的“最拿不准样本”，并已由人工补充标准答案。\n\n示例：\n- 碎玻璃杯 -> 其他垃圾（判断依据：虽然玻璃可回收，但碎玻璃有安全隐患，不作常规回收）\n- 用过的擦嘴纸巾 -> 其他垃圾（判断依据：水溶性强且被污染，没有造纸回收价值）\n- 沾满泥土的废旧衣物 -> 其他垃圾（判断依据：被严重污染的织物无法二次利用）\n\n测试：沾满油渍的披萨盒 -> ？",
+        "afterResponse": "第 1 步：披萨盒的基础材质是纸，正常情况下通常会被理解为可回收物。\n\n第 2 步：参考这些高难样本，可以提炼出同一条边界规则：如果物品虽然原本可回收，但已经被污染、存在安全隐患，或者失去再利用价值，就不能再按常规可回收处理。\n\n第 3 步：沾满油渍的披萨盒已经被食物油污污染，纸张纤维失去再造纸价值，因此不能按普通纸类回收。\n\n结论：属于其他垃圾。\n\n提示：这一轮 Active-Prompt 真正补上的，不是“纸是什么垃圾”这种基础题，而是“被污染后怎么改判”这种最容易翻车的边界题。",
         "outcomes": [
           {
             "label": "人工投入",
-            "value": "更少"
+            "value": "更聚焦"
           },
           {
-            "label": "复杂场景覆盖",
-            "value": "更好"
+            "label": "边界样本覆盖",
+            "value": "更强"
           },
           {
-            "label": "团队沉淀",
-            "value": "更适合模板化"
+            "label": "团队模板化",
+            "value": "更稳"
           }
         ],
-        "learningsLabel": "Tips",
+        "learningsLabel": "金句总结",
         "learnings": [
-          "不是替 AI 把所有活都干了，而是让 AI 先暴露不会的点。",
-          "人只负责教最难的那部分，剩下的再交给 AI 扩散生成。",
-          "Active-Prompt 特别适合测试用例、复杂表结构和高难规则场景。"
+          "Few-shot 的质量，往往比数量更重要。",
+          "普通提示是在教 AI 做“基础题”，Active-Prompt 是在教 AI 解“压轴题”。",
+          "人不用平均用力，只要优先补最容易误判的那几题。"
         ],
         "icon": "concept"
       }
@@ -990,38 +1066,38 @@
       "eyebrow": "技术核心 15",
       "title": "Reflexion",
       "variant": "interactive-chat",
-      "subtitle": "给 AI 加装一道“自我 Code Review”工序，通过闭环迭代自证。",
+      "subtitle": "给 AI 加装一道“先自审、再交付”的 SQL Code Review 工序，让思考、反思和终版结果分层呈现。",
       "payload": {
-        "scenario": "反思架构",
+        "scenario": "让 AI 按步骤自检后再提交 SQL",
         "challengeLabel": "反馈循环",
         "challenge": [
-          "包含 Actor、Evaluator 和 Self-Reflection 三个模块",
-          "将错误信息存入记忆，在下一轮迭代中主动规避",
-          "通过多轮自我对抗演进，实现最终产出的卓越品质"
+          "提示词必须具体到车间、时间范围、表名、字段口径，否则 SQL 只能靠猜。",
+          "先汇总不良，再汇总领料，再做关联，避免不良明细与领料明细直接 Join 导致数据放大。",
+          "最终交付要把“思考过程摘要”和“可执行终版 SQL”分开展示，方便评审、复盘与直接复用。"
         ],
-        "beforeLabel": "案例：代码质量的自我博弈",
-        "beforePrompt": "你是一个 DBA。请帮我写一段 SQL：查询某车间本月所有产生过不良品的工单及其物料消耗明细。\n\n【强制要求】\n1. 初稿生成\n2. 漏洞反思：审视是否存在全表扫描、多表 Join 性能问题或数据重复计算\n3. 优化修正\n4. 最终只输出优化后的终版 SQL",
+        "beforeLabel": "案例：制造业 SQL 自反思",
+        "beforePrompt": "你是一名精通制造业 MES 的资深 DBA，请为 MySQL 8 编写一段可直接执行的 SQL。\n\n业务场景：查询“总装二车间”在 2026-03-01 至 2026-03-31 期间，所有产生过不良品的工单，以及这些工单对应的物料消耗汇总明细。\n\n已知表与关键字段如下：\n1. mes_work_order wo\n- wo.id：工单主键\n- wo.work_order_no：工单号\n- wo.workshop_code：车间编码\n- wo.workshop_name：车间名称\n- wo.product_code：产品编码\n- wo.product_name：产品名称\n- wo.completed_time：完工时间\n\n2. mes_bad_record br\n- br.id：不良记录主键\n- br.work_order_id：工单主键\n- br.bad_qty：不良数量\n- br.bad_reason_code：不良原因编码\n- br.created_at：不良登记时间\n\n3. mes_material_issue mi\n- mi.id：领料明细主键\n- mi.work_order_id：工单主键\n- mi.material_code：物料编码\n- mi.material_name：物料名称\n- mi.issued_qty：领料数量\n- mi.unit：单位\n- mi.issued_at：领料时间\n\n业务口径：\n- 只统计 workshop_code = 'WS-ASSY-02' 的工单。\n- 只统计 br.bad_qty > 0 且 br.created_at 在 2026-03-01（含）到 2026-04-01（不含）之间的数据。\n- 同一工单可能有多条不良记录，必须先按工单汇总不良总数。\n- 同一工单同一物料可能多次领料，必须先按工单 + 物料汇总消耗数量。\n- 输出列：工单号、产品编码、产品名称、不良总数、物料编码、物料名称、物料消耗总数、单位。\n- 结果按“不良总数倒序、工单号升序、物料编码升序”排序。\n- 必须尽量避免全表扫描、宽表 Join 和重复计算。\n\n请严格按以下 Reflexion 步骤执行：\n第 1 步：先写出初稿思路，说明最直观的 Join 路径。\n第 2 步：做自我反思，逐条检查：\n- 是否缺少能命中索引的时间过滤；\n- 是否把不良明细和领料明细直接 Join 导致乘积放大；\n- 是否在过滤前就做了大范围聚合；\n- 是否应该先分别汇总，再做关联。\n第 3 步：给出优化修正思路，说明每个 CTE / 子查询的职责。\n\n最终输出：最终输出部分只放终版 SQL 代码块，不要解释性废话。",
         "afterLabel": "AI 预期输出摘录",
-        "afterPrompt": "<反思>：初稿 SQL 虽然关联了工单和物料表，但缺少本月时间范围的索引条件，并且直接 JOIN 导致部分明细重复计算。\n\n<修正后>：补充时间过滤、调整关联方式，并输出优化后的终版 SQL。",
+        "afterPrompt": "第 1 步：初稿思路\n最直观的写法是 br -> wo -> mi 三表直接 Join，然后按工单号、物料编码分组汇总。\n这种写法能快速得到结果，但它把“不良明细”和“领料明细”两个一对多关系同时摊平，天然存在结果被放大的风险。\n\n第 2 步：自我反思\n1. 时间过滤风险：如果只在外层按月份过滤，而不是在 br.created_at 上先过滤，会让不良表扫描范围过大，难以命中时间索引。\n2. 重复计算风险：一个工单若有 3 条不良记录、2 条领料记录，直接 Join 后会变成 6 行，SUM(bad_qty) 和 SUM(issued_qty) 都可能被重复放大。\n3. 聚合顺序风险：先 Join 再聚合，会让中间结果集膨胀，既慢又容易出错。\n4. 修正方向：应该先把“本月有不良的工单”缩小出来，再分别汇总不良数量与物料消耗，最后基于 work_order_id 做关联。\n\n第 3 步：优化修正\n1. bad_work_orders：先在 br 上做时间过滤与 bad_qty > 0 过滤，再关联工单表，只保留总装二车间，并汇总每张工单的不良总数。\n2. material_summary：只针对 bad_work_orders 中出现过的工单，继续汇总其物料消耗，避免扫描无关领料数据。\n3. final select：用汇总后的工单结果左连接物料汇总结果，既保留所有不良工单，又避免重复计算。\n\n最终输出：\n```sql\nWITH bad_work_orders AS (\n    SELECT\n        wo.id AS work_order_id,\n        wo.work_order_no,\n        wo.product_code,\n        wo.product_name,\n        SUM(br.bad_qty) AS total_bad_qty\n    FROM mes_bad_record br\n    INNER JOIN mes_work_order wo\n        ON wo.id = br.work_order_id\n    WHERE wo.workshop_code = 'WS-ASSY-02'\n      AND br.bad_qty > 0\n      AND br.created_at >= '2026-03-01'\n      AND br.created_at < '2026-04-01'\n    GROUP BY\n        wo.id,\n        wo.work_order_no,\n        wo.product_code,\n        wo.product_name\n),\nmaterial_summary AS (\n    SELECT\n        mi.work_order_id,\n        mi.material_code,\n        mi.material_name,\n        SUM(mi.issued_qty) AS total_issued_qty,\n        MAX(mi.unit) AS unit\n    FROM mes_material_issue mi\n    INNER JOIN bad_work_orders bwo\n        ON bwo.work_order_id = mi.work_order_id\n    WHERE mi.issued_at >= '2026-03-01'\n      AND mi.issued_at < '2026-04-01'\n    GROUP BY\n        mi.work_order_id,\n        mi.material_code,\n        mi.material_name\n)\nSELECT\n    bwo.work_order_no,\n    bwo.product_code,\n    bwo.product_name,\n    bwo.total_bad_qty,\n    ms.material_code,\n    ms.material_name,\n    COALESCE(ms.total_issued_qty, 0) AS total_issued_qty,\n    COALESCE(ms.unit, '') AS unit\nFROM bad_work_orders bwo\nLEFT JOIN material_summary ms\n    ON ms.work_order_id = bwo.work_order_id\nORDER BY\n    bwo.total_bad_qty DESC,\n    bwo.work_order_no ASC,\n    ms.material_code ASC;\n```",
         "outcomes": [
           {
-            "label": "初稿风险",
-            "value": "可提前暴露"
+            "label": "Prompt 具体度",
+            "value": "车间 / 表 / 字段 / 口径"
           },
           {
-            "label": "低级 Bug",
-            "value": "显著减少"
+            "label": "反思深度",
+            "value": "按 3 步逐项自检"
           },
           {
-            "label": "Tips",
-            "value": "先自审再输出"
+            "label": "最终产物",
+            "value": "可执行终版 SQL"
           }
         ],
         "learningsLabel": "实战认识",
         "learnings": [
-          "Reflexion 适合给 AI 加一道强制自检工序。",
-          "不要直接拿 AI 第一次草稿进生产。",
-          "在提示词里加“自我反思”，能拦截掉大量显而易见的问题。"
+          "Reflexion 不是让 AI 泛泛而谈“我反思了”，而是让它按你规定的检查项逐条自检。",
+          "制造业 SQL 场景里，车间、时间、表关系和汇总口径写得越具体，模型越可能一次产出可落地结果。",
+          "演示页面里一定要把“思考摘要”和“最终 SQL”拆开，否则观众只会看到一段模糊结论，不知道 AI 到底改对了什么。"
         ],
         "scenarioLabel": "TECHNIQUE",
         "icon": "shield"
