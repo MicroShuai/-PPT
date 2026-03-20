@@ -21,6 +21,30 @@ const isOutputLabel = (label: string | undefined) => {
   return /AI|输出|结果|结论|回答|推理|决策|模拟|展示|ToT|RAG|Ans|Prop|Refiner/i.test(l)
 }
 
+const splitLabeledContent = (value: string | undefined) => {
+  const trimmed = value?.trim() || ''
+  const matched = trimmed.match(/^([^：:]{2,40})[：:]\s*([\s\S]+)$/)
+
+  if (!matched) {
+    return {
+      title: '',
+      body: trimmed
+    }
+  }
+
+  return {
+    title: matched[1].trim(),
+    body: matched[2].trim()
+  }
+}
+
+const shortenText = (value: string | undefined, limit = 120) => {
+  const normalized = (value || '').replace(/\s+/g, ' ').trim()
+
+  if (normalized.length <= limit) return normalized
+  return `${normalized.slice(0, limit).trim()}...`
+}
+
 // 解析混合了 Prompt 和 Response 的字符串（旧版数据格式支持）
 const parseCombined = (str: string | undefined) => {
   if (!str) return null
@@ -71,6 +95,31 @@ const chatItems = computed(() => {
   const hasPrompt = !!payload.beforePrompt
   const hasAfterPromptResponse = payload.afterPrompt && isOutputLabel(payload.afterLabel)
   const hasExplicitResponse = !!(payload.afterResponse || payload.beforeResponse)
+  const hasTwoPromptResponsePairs = Boolean(
+    payload.beforePrompt?.trim()
+    && payload.afterPrompt?.trim()
+    && payload.beforeResponse?.trim()
+    && payload.afterResponse?.trim()
+    && !hasAfterPromptResponse
+  )
+
+  if (hasTwoPromptResponsePairs) {
+    items.push({
+      prompt: payload.beforePrompt.trim(),
+      response: payload.beforeResponse?.trim() || '',
+      label: payload.beforeLabel || normalizePromptHeader(),
+      responseLabel: normalizeResponseHeader()
+    })
+
+    items.push({
+      prompt: payload.afterPrompt.trim(),
+      response: payload.afterResponse?.trim() || '',
+      label: payload.afterLabel || normalizePromptHeader(),
+      responseLabel: normalizeResponseHeader()
+    })
+
+    return items
+  }
 
   if (hasPrompt && (hasAfterPromptResponse || hasExplicitResponse)) {
     items.push({
@@ -124,6 +173,13 @@ const interactiveUsesToggle = computed(() => {
   )
 })
 
+const useStaticChatLayout = computed(() => Boolean(props.slide.payload.staticChat))
+const isRagSlide = computed(() => props.slide.id === 'rag')
+const chatStreamDelayMultiplier = computed(() =>
+  ['cot', 'cot-transaction'].includes(props.slide.id) ? 2.2 : 1
+)
+const shouldInlineAlerts = computed(() => props.slide.id === 'rag')
+
 // 获取当前 Manifesto 布局应显示的聊天内容
 const manifestoChatItem = computed(() => {
   if (manifestoUsesToggle.value) {
@@ -133,7 +189,10 @@ const manifestoChatItem = computed(() => {
         : (props.slide.payload.beforePrompt || ''),
       response: isComparisonCorrected.value
         ? (props.slide.payload.afterResponse || '')
-        : (props.slide.payload.beforeResponse || '')
+        : (props.slide.payload.beforeResponse || ''),
+      thinkingText: isComparisonCorrected.value
+        ? (props.slide.payload.afterThinkingText || undefined)
+        : (props.slide.payload.beforeThinkingText || undefined)
     }
   }
 
@@ -150,8 +209,87 @@ const interactiveChatItem = computed(() => ({
     : (props.slide.payload.beforePrompt || ''),
   response: isComparisonCorrected.value
     ? (props.slide.payload.afterResponse || '')
-    : (props.slide.payload.beforeResponse || '')
+    : (props.slide.payload.beforeResponse || ''),
+  thinkingText: isComparisonCorrected.value
+    ? (props.slide.payload.afterThinkingText || undefined)
+    : (props.slide.payload.beforeThinkingText || undefined),
+  toolResultText: isComparisonCorrected.value
+    ? (props.slide.payload.afterToolResultText || undefined)
+    : (props.slide.payload.beforeToolResultText || undefined),
+  toolResultLabel: isComparisonCorrected.value
+    ? (props.slide.payload.afterToolResultLabel || undefined)
+    : (props.slide.payload.beforeToolResultLabel || undefined)
 }))
+
+const workflowTechniques = computed(() =>
+  (props.slide.payload.outcomes ?? []).map((item, idx) => {
+    const tone
+      = /RAG|Retrieval/i.test(item.label)
+        ? 'blue'
+        : /CoT|ToT|Thought/i.test(item.label)
+          ? 'emerald'
+          : /模板|Template|Spec|交付/i.test(item.label)
+            ? 'amber'
+            : idx % 2 === 0
+              ? 'slate'
+              : 'indigo'
+
+    return {
+      ...item,
+      tone
+    }
+  })
+)
+
+const workflowModules = computed(() =>
+  (props.slide.payload.challenge ?? []).map((item, idx) => {
+    const { title, body } = splitLabeledContent(item)
+    const heading = title || `模块 ${idx + 1}`
+    const tone
+      = /RAG|检索/i.test(heading)
+        ? 'blue'
+        : /CoT|ToT|推理|思维/i.test(heading)
+          ? 'emerald'
+          : /模板|交付|任务单|输出/i.test(heading)
+            ? 'amber'
+            : /风险|回滚|约束|审查/i.test(heading)
+              ? 'rose'
+              : 'slate'
+
+    return {
+      title: heading,
+      body: body || item,
+      tone,
+      index: idx + 1
+    }
+  })
+)
+
+const workflowChatItem = computed(() => {
+  const payload = props.slide.payload
+
+  if (payload.afterPrompt?.trim() && payload.afterResponse?.trim()) {
+    return {
+      prompt: payload.afterPrompt.trim(),
+      response: payload.afterResponse.trim(),
+      label: payload.afterLabel || 'Good Prompt',
+      responseLabel: normalizeResponseHeader()
+    }
+  }
+
+  const [firstItem] = chatItems.value
+
+  return {
+    prompt: firstItem?.prompt || payload.beforePrompt || '',
+    response: firstItem?.response || payload.afterResponse || payload.beforeResponse || '',
+    label: firstItem?.label || payload.afterLabel || payload.beforeLabel || normalizePromptHeader(),
+    responseLabel: firstItem?.responseLabel || normalizeResponseHeader()
+  }
+})
+
+const workflowBadPromptPreview = computed(() =>
+  shortenText(props.slide.payload.beforePrompt, 112)
+)
 
 // 根据标签文本自动映射相应的图标
 const labelToIcon = (label: string | undefined): string => {
@@ -171,6 +309,54 @@ const labelToIcon = (label: string | undefined): string => {
 }
 
 const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.slide.payload.challengeLabel))
+
+const workflowToneClasses = (tone: string) => {
+  if (tone === 'blue') {
+    return {
+      chip: 'bg-blue-100 text-blue-700',
+      card: 'border-blue-200/70 bg-blue-50/70',
+      meta: 'text-blue-500'
+    }
+  }
+
+  if (tone === 'emerald') {
+    return {
+      chip: 'bg-emerald-100 text-emerald-700',
+      card: 'border-emerald-200/70 bg-emerald-50/70',
+      meta: 'text-emerald-500'
+    }
+  }
+
+  if (tone === 'amber') {
+    return {
+      chip: 'bg-amber-100 text-amber-700',
+      card: 'border-amber-200/70 bg-amber-50/75',
+      meta: 'text-amber-500'
+    }
+  }
+
+  if (tone === 'rose') {
+    return {
+      chip: 'bg-rose-100 text-rose-700',
+      card: 'border-rose-200/70 bg-rose-50/75',
+      meta: 'text-rose-500'
+    }
+  }
+
+  if (tone === 'indigo') {
+    return {
+      chip: 'bg-indigo-100 text-indigo-700',
+      card: 'border-indigo-200/70 bg-indigo-50/75',
+      meta: 'text-indigo-500'
+    }
+  }
+
+  return {
+    chip: 'bg-slate-100 text-slate-700',
+    card: 'border-slate-200/70 bg-slate-50/80',
+    meta: 'text-slate-400'
+  }
+}
 </script>
 
 <template>
@@ -315,11 +501,15 @@ const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.
           </div>
         </div>
 
-        <div class="flex-1 min-h-0 overflow-auto px-6 pt-5 pb-7 custom-scrollbar-chat">
+        <div class="flex min-h-0 flex-1 overflow-hidden px-6 pt-5 pb-7">
           <StreamingChat
             :key="isComparisonCorrected ? 'manifesto-opt' : 'manifesto-raw'"
             :prompt="manifestoChatItem.prompt"
             :response="manifestoChatItem.response"
+            :thinking-text="manifestoChatItem.thinkingText"
+            :bare-prompt="isRagSlide"
+            :stream-delay-multiplier="chatStreamDelayMultiplier"
+            :inline-alerts="shouldInlineAlerts"
             compact
             auto-start
           />
@@ -335,6 +525,9 @@ const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.
           key="manifesto-single"
           :prompt="manifestoChatItem.prompt"
           :response="manifestoChatItem.response"
+          :bare-prompt="isRagSlide"
+          :stream-delay-multiplier="chatStreamDelayMultiplier"
+          :inline-alerts="shouldInlineAlerts"
           compact
           auto-start
         />
@@ -735,11 +928,23 @@ const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.
           </div>
         </div>
 
-        <div class="flex-1 min-h-0 overflow-auto px-6 pt-5 pb-7 custom-scrollbar-chat">
+        <div
+          :class="useStaticChatLayout
+            ? 'flex-1 overflow-auto custom-scrollbar-chat px-5 pt-4 pb-5'
+            : 'flex min-h-0 flex-1 overflow-auto custom-scrollbar-chat px-6 pt-5 pb-7'"
+        >
           <StreamingChat
             :key="isComparisonCorrected ? 'interactive-opt' : 'interactive-raw'"
             :prompt="interactiveChatItem.prompt"
             :response="interactiveChatItem.response"
+            :thinking-text="interactiveChatItem.thinkingText"
+            :tool-result-text="interactiveChatItem.toolResultText"
+            :tool-result-label="interactiveChatItem.toolResultLabel"
+            :static-layout="useStaticChatLayout"
+            :disable-thinking="Boolean(slide.payload.disableThinking)"
+            :compact="useStaticChatLayout"
+            :stream-delay-multiplier="chatStreamDelayMultiplier"
+            :inline-alerts="shouldInlineAlerts"
             auto-start
           />
         </div>
@@ -747,7 +952,8 @@ const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.
 
       <div
         v-else
-        class="flex flex-col min-h-0 gap-4 overflow-auto pr-1 custom-scrollbar-chat"
+        class="flex flex-col min-h-0 gap-4"
+        :class="useStaticChatLayout ? 'overflow-hidden pr-0' : 'overflow-auto pr-1 custom-scrollbar-chat'"
         v-bind="motion('chat')"
       >
         <template
@@ -760,6 +966,11 @@ const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.
               :response="item.response"
               :prompt-label="item.label"
               :response-label="item.responseLabel"
+              :static-layout="useStaticChatLayout"
+              :disable-thinking="Boolean(slide.payload.disableThinking)"
+              :compact="useStaticChatLayout"
+              :stream-delay-multiplier="chatStreamDelayMultiplier"
+              :inline-alerts="shouldInlineAlerts"
               auto-start
             />
           </div>
@@ -875,6 +1086,8 @@ const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.
               :prompt-label="item.label"
               :response-label="item.responseLabel"
               :variant="idx === 0 && chatItems.length > 1 ? 'error' : 'default'"
+              :stream-delay-multiplier="chatStreamDelayMultiplier"
+              :inline-alerts="shouldInlineAlerts"
               auto-start
             />
           </div>
@@ -903,9 +1116,9 @@ const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.
     <!-- ════════════════════════════════════════════════════════ -->
     <div
       v-else-if="layout === 'workflow'"
-      class="grid h-full min-h-0 grid-cols-[0.9fr_1.1fr] gap-5"
+      class="grid h-full min-h-0 grid-cols-[0.84fr_1.16fr] gap-5"
     >
-      <div class="grid min-h-0 grid-rows-[auto_auto_1fr] gap-5">
+      <div class="grid min-h-0 grid-rows-[auto_auto_1fr_auto] gap-[18px]">
         <div
           class="shrink-0 rounded-[22px] border border-blue-200/60 bg-gradient-to-br from-blue-50/80 to-white px-6 py-5 shadow-sm"
           v-bind="motion('panel')"
@@ -924,58 +1137,154 @@ const activeIcon = computed(() => props.slide.payload.icon || labelToIcon(props.
           </p>
         </div>
         <div
+          class="grid shrink-0 grid-cols-3 gap-3"
+          v-bind="motion('rail')"
+        >
+          <div
+            v-for="(item, idx) in workflowTechniques"
+            :key="`${item.label}-${idx}`"
+            class="rounded-[20px] border px-4 py-4 shadow-sm"
+            :class="workflowToneClasses(item.tone).card"
+            v-bind="motion('list-item', idx)"
+          >
+            <p
+              class="inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold tracking-[0.12em]"
+              :class="workflowToneClasses(item.tone).chip"
+            >
+              TECH {{ idx + 1 }}
+            </p>
+            <h4 class="mt-3 text-[13px] font-bold leading-snug text-slate-900">
+              {{ item.label }}
+            </h4>
+            <p class="mt-2 text-[12px] leading-relaxed text-slate-600">
+              {{ item.value }}
+            </p>
+          </div>
+        </div>
+        <div
           class="flex min-h-0 flex-col rounded-[22px] border border-slate-200/70 bg-white/70 p-5 shadow-sm backdrop-blur-sm overflow-hidden"
           v-bind="motion('rail')"
         >
-          <p class="slide-label mb-4 flex items-center gap-2 text-slate-500">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="text-rose-500"
-            >
-              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
-              <path d="M12 9v4" />
-              <path d="M12 17h.01" />
-            </svg>
-            {{ slide.payload.challengeLabel ?? 'Constraints' }}
-          </p>
-          <ul class="space-y-3 overflow-auto custom-scrollbar flex-1">
-            <li
-              v-for="(item, idx) in slide.payload.challenge"
-              :key="item"
-              class="rounded-xl bg-slate-50/80 px-4 py-3 text-[13.5px] leading-relaxed text-slate-600"
+          <div class="mb-4 flex items-center justify-between gap-3">
+            <p class="slide-label flex items-center gap-2 text-slate-500">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="text-rose-500"
+              >
+                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                <path d="M12 9v4" />
+                <path d="M12 17h.01" />
+              </svg>
+              {{ slide.payload.challengeLabel ?? 'Constraints' }}
+            </p>
+            <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold tracking-[0.14em] text-slate-500">
+              {{ workflowModules.length }} MODULES
+            </span>
+          </div>
+          <div class="grid flex-1 auto-rows-fr grid-cols-2 gap-3 overflow-auto pr-1 custom-scrollbar">
+            <article
+              v-for="(item, idx) in workflowModules"
+              :key="`${item.title}-${idx}`"
+              class="rounded-[18px] border p-4 shadow-sm"
+              :class="workflowToneClasses(item.tone).card"
               v-bind="motion('list-item', idx)"
             >
-              {{ item }}
-            </li>
-          </ul>
+              <div class="mb-3 flex items-center justify-between gap-2">
+                <span
+                  class="inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold tracking-[0.08em]"
+                  :class="workflowToneClasses(item.tone).chip"
+                >
+                  {{ item.title }}
+                </span>
+                <span
+                  class="text-[10px] font-bold tracking-[0.18em]"
+                  :class="workflowToneClasses(item.tone).meta"
+                >
+                  0{{ item.index }}
+                </span>
+              </div>
+              <p class="text-[12.5px] leading-relaxed text-slate-600">
+                {{ item.body }}
+              </p>
+            </article>
+          </div>
+        </div>
+        <div
+          class="slide-quote-card shrink-0 px-5 py-4 bg-amber-50/60 border-amber-200/50"
+          v-bind="motion('quote')"
+        >
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p class="slide-label text-amber-700 font-bold flex items-center gap-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="text-amber-500"
+                >
+                  <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+                  <path d="M9 18h6" />
+                  <path d="M10 22h4" />
+                </svg>
+                {{ slide.payload.learningsLabel ?? 'Best Practices' }}
+              </p>
+              <ul class="mt-3 space-y-2.5">
+                <li
+                  v-for="item in slide.payload.learnings"
+                  :key="item"
+                  class="text-[12.5px] leading-relaxed text-amber-900/80 font-medium flex items-start gap-2.5"
+                >
+                  <span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-amber-400 shrink-0" />
+                  {{ item }}
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
       <div
         class="min-h-0 flex-1 flex flex-col gap-4 overflow-auto pr-1 custom-scrollbar-chat"
         v-bind="motion('chat')"
       >
-        <template
-          v-for="item in chatItems"
-          :key="item.prompt"
+        <div
+          v-if="workflowBadPromptPreview"
+          class="shrink-0 rounded-[18px] border border-rose-200/60 bg-rose-50/65 px-4 py-3 shadow-sm"
         >
-          <div class="chat-item shrink-0">
-            <StreamingChat
-              :prompt="item.prompt"
-              :response="item.response"
-              :prompt-label="item.label"
-              :response-label="item.responseLabel"
-              auto-start
-            />
-          </div>
-        </template>
+          <p class="slide-label text-rose-600">
+            {{ slide.payload.beforeLabel ?? 'Bad Prompt' }}
+          </p>
+          <p class="mt-2 text-[12.5px] leading-relaxed text-rose-900/75">
+            {{ workflowBadPromptPreview }}
+          </p>
+        </div>
+        <div class="chat-item shrink-0">
+          <StreamingChat
+            :prompt="workflowChatItem.prompt"
+            :response="workflowChatItem.response"
+            :prompt-label="workflowChatItem.label"
+            :response-label="workflowChatItem.responseLabel"
+            :static-layout="useStaticChatLayout"
+            :disable-thinking="Boolean(slide.payload.disableThinking)"
+            :compact="useStaticChatLayout"
+            :stream-delay-multiplier="chatStreamDelayMultiplier"
+            :inline-alerts="shouldInlineAlerts"
+            auto-start
+          />
+        </div>
       </div>
     </div>
   </SlideShell>

@@ -12,9 +12,11 @@ const props = defineProps<{
 
 const diagramRef = ref<HTMLDivElement | null>(null); // Mermaid 图表容器引用
 const layout = computed(() => props.slide.variant ?? 'route'); // 流程图布局变体
+const isPromptChainingSlide = computed(() => props.slide.id === 'prompt-chaining')
 const isArtSlide = computed(() => props.slide.id === 'art'); // 是否为 ART (Automatic Reasoning and Tool-use) 幻灯片
 const isArtRuntimeSlide = computed(() => props.slide.id === 'art-runtime'); // 是否为 ART 工具调用闭环页
 const storyboard = computed(() => props.slide.payload.storyboard); // 故事板数据（用于逐步演示）
+const promptChainContent = computed(() => props.slide.payload.promptChain)
 const checkpoints = computed(() => props.slide.payload.checkpoints ?? []); // 流程关键节点
 const challengePoints = computed(() => props.slide.payload.challenge ?? []); // 面临的挑战或痛点
 const takeawayLabel = computed(() => props.slide.payload.takeawayLabel ?? 'Tips'); // 金句/提示标签
@@ -593,6 +595,239 @@ onBeforeUnmount(() => {
     </div>
 
     <div
+      v-else-if="isPromptChainingSlide"
+      class="grid h-full min-h-0 min-w-0 grid-cols-[0.78fr_1.22fr] gap-6"
+    >
+      <div class="grid min-h-0 min-w-0 grid-rows-[auto_minmax(0,1fr)_auto] gap-5">
+        <div
+          class="shrink-0 rounded-[22px] border border-blue-200/60 bg-gradient-to-br from-blue-50/80 to-white px-7 py-5 shadow-sm"
+          v-bind="motion('lead')"
+        >
+          <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-500">
+            {{ slide.payload.scenarioLabel ?? 'TECHNIQUE' }}
+          </p>
+          <h3 class="mt-2 text-[22px] font-black leading-tight text-slate-900">
+            {{ slide.payload.scenario ?? slide.title }}
+          </h3>
+          <p
+            v-if="slide.subtitle"
+            class="mt-3 text-[13px] leading-relaxed text-slate-500"
+          >
+            {{ slide.subtitle }}
+          </p>
+        </div>
+
+        <div
+          class="flex min-h-0 flex-col overflow-hidden rounded-[22px] border border-slate-200/70 bg-white/70 p-6 shadow-sm backdrop-blur-sm"
+          v-bind="motion('rail')"
+        >
+          <p class="slide-label mb-4 flex items-center gap-2 text-slate-500">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="text-indigo-500"
+            >
+              <line
+                x1="6"
+                x2="6"
+                y1="3"
+                y2="15"
+              />
+              <circle
+                cx="18"
+                cy="6"
+                r="3"
+              />
+              <circle
+                cx="6"
+                cy="18"
+                r="3"
+              />
+              <path d="M18 9a9 9 0 0 1-9 9" />
+            </svg>
+            {{ slide.payload.challengeLabel ?? '核心逻辑' }}
+          </p>
+
+          <div class="flex-1 space-y-3 overflow-auto pr-1">
+            <article
+              v-for="(item, index) in promptChainContent?.principles ?? []"
+              :key="item.label"
+              class="rounded-[18px] border border-slate-200/80 bg-slate-50/80 px-4 py-4"
+              v-bind="motion('card', index)"
+            >
+              <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-blue-600">
+                {{ item.label }}
+              </p>
+              <p class="mt-2 text-[13px] leading-6 text-slate-700">
+                {{ item.body }}
+              </p>
+            </article>
+          </div>
+        </div>
+
+        <div
+          class="slide-quote-card shrink-0 px-6 py-5 bg-amber-50/60 border-amber-200/50"
+          v-bind="motion('quote')"
+        >
+          <p class="slide-label mb-3 text-amber-700 font-bold flex items-center gap-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="text-amber-500"
+            >
+              <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+              <path d="M9 18h6" />
+              <path d="M10 22h4" />
+            </svg>
+            {{ takeawayLabel }}
+          </p>
+          <p class="text-[13px] font-medium leading-6 text-amber-900">
+            {{ slide.payload.takeaway }}
+          </p>
+
+          <ul
+            v-if="artTips.length > 0"
+            class="mt-3 space-y-2.5"
+          >
+            <li
+              v-for="(item, index) in artTips"
+              :key="item"
+              class="text-[12.5px] leading-relaxed text-amber-900/80 font-medium flex items-start gap-2.5"
+              v-bind="motion('checkpoint', index)"
+            >
+              <span class="mt-2 h-1 w-1 shrink-0 rounded-full bg-amber-400" />
+              {{ item }}
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="grid min-h-0 min-w-0 grid-rows-[auto_minmax(0,1fr)] gap-5">
+        <div
+          class="slide-stage px-6 py-5"
+          v-bind="motion('panel')"
+        >
+          <div class="mb-4 flex items-start justify-between gap-5">
+            <div>
+              <p class="slide-label mb-2 text-blue-700/80">
+                MES 实战逻辑拆解
+              </p>
+              <p class="text-[14px] leading-6 text-slate-600">
+                按“先分析、再设计、最后生成代码”的三段式，把复杂开发任务拆成可校验的小步骤。
+              </p>
+            </div>
+
+            <div class="inline-flex items-center rounded-full border border-blue-100 bg-blue-50/80 px-3 py-1.5">
+              <span class="text-[10px] font-semibold uppercase tracking-[0.18em] text-blue-700">Analyze</span>
+              <span class="mx-2 text-slate-300">→</span>
+              <span class="text-[10px] font-semibold uppercase tracking-[0.18em] text-indigo-600">Design</span>
+              <span class="mx-2 text-slate-300">→</span>
+              <span class="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-700">Code</span>
+            </div>
+          </div>
+
+          <div class="grid gap-4 xl:grid-cols-3">
+            <article
+              v-for="(item, index) in promptChainContent?.steps ?? []"
+              :key="item.label"
+              class="rounded-[22px] border border-slate-200/80 bg-white/78 px-4 py-4 shadow-sm"
+              v-bind="motion('card', index)"
+            >
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                    {{ item.label }}
+                  </p>
+                  <h4 class="mt-1 text-[15px] font-semibold leading-6 text-slate-900">
+                    {{ item.title }}
+                  </h4>
+                </div>
+                <span class="slide-number-chip !h-9 !w-9 !text-sm">
+                  {{ index + 1 }}
+                </span>
+              </div>
+
+              <div class="mt-3 rounded-[18px] border border-blue-100/90 bg-blue-50/70 px-3.5 py-3">
+                <p class="text-[10px] font-semibold uppercase tracking-[0.16em] text-blue-600">
+                  输出重点
+                </p>
+                <p class="mt-1.5 text-[12px] leading-5 text-slate-700">
+                  {{ item.focus }}
+                </p>
+              </div>
+
+              <div class="mt-3 rounded-[18px] border border-slate-200/90 bg-slate-50/90 px-3.5 py-3">
+                <p class="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                  Prompt
+                </p>
+                <p class="mt-1.5 text-[12px] leading-[1.65] text-slate-700">
+                  {{ item.prompt }}
+                </p>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div
+          class="slide-stage min-h-0 p-5"
+          v-bind="motion('diagram')"
+        >
+          <div class="mb-3 flex items-center justify-between gap-4">
+            <p class="slide-label text-blue-700/80">
+              {{ promptChainContent?.diagramLabel ?? '流程图' }}
+            </p>
+            <span class="slide-ribbon !px-3 !py-1.5 !text-[10px]">
+              Workflow Blueprint
+            </span>
+          </div>
+
+          <div class="flex h-[calc(100%-2.5rem)] items-center justify-between gap-4">
+            <template
+              v-for="(item, index) in promptChainContent?.steps ?? []"
+              :key="`prompt-chain-flow-${item.label}`"
+            >
+              <article class="flex min-h-[130px] flex-1 flex-col justify-center rounded-[24px] border border-blue-200/80 bg-blue-50/55 px-4 py-4 shadow-sm">
+                <p class="text-[10px] font-semibold uppercase tracking-[0.16em] text-blue-600">
+                  {{ item.label }}
+                </p>
+                <h4 class="mt-2 text-[15px] font-semibold leading-6 text-slate-900">
+                  {{ item.title }}
+                </h4>
+                <p class="mt-2 text-[12px] leading-5 text-slate-600">
+                  {{ item.focus }}
+                </p>
+              </article>
+
+              <div
+                v-if="index < (promptChainContent?.steps?.length ?? 0) - 1"
+                class="flex w-10 shrink-0 items-center justify-center"
+                aria-hidden="true"
+              >
+                <span class="flex h-9 w-9 items-center justify-center rounded-full border border-blue-100 bg-white/80 text-[18px] font-semibold text-blue-500 shadow-sm">
+                  →
+                </span>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
       v-else-if="isArtSlide"
       class="grid h-full min-h-0 min-w-0 grid-cols-[0.82fr_1.18fr] gap-6"
     >
@@ -1068,17 +1303,20 @@ onBeforeUnmount(() => {
       </div>
 
       <div
-        class="slide-chat-glass min-h-0 overflow-hidden px-5 py-4"
+        class="art-runtime-panel flex min-h-0 flex-col overflow-hidden rounded-[24px]"
         v-bind="motion('panel')"
       >
-        <p class="slide-label mb-3 text-blue-700/80">
-          执行链路展示
-        </p>
-
-        <AgentRuntimeDemo
-          v-if="runtimeChat.length > 0"
-          :conversation="runtimeChat"
-        />
+        <div class="art-runtime-panel__header shrink-0 px-6 py-3.5">
+          <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-500">
+            执行链路展示
+          </p>
+        </div>
+        <div class="flex-1 min-h-0 overflow-hidden px-3 pb-4">
+          <AgentRuntimeDemo
+            v-if="runtimeChat.length > 0"
+            :conversation="runtimeChat"
+          />
+        </div>
       </div>
     </div>
 
@@ -1199,6 +1437,46 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
+.art-runtime-panel {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid rgba(226, 236, 250, 0.62);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(241, 247, 255, 0.08)),
+    radial-gradient(circle at top right, rgba(152, 191, 255, 0.2), transparent 26%),
+    radial-gradient(circle at left center, rgba(255, 255, 255, 0.12), transparent 34%);
+  backdrop-filter: blur(24px) saturate(1.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 18px 44px rgba(148, 163, 184, 0.08);
+}
+
+.art-runtime-panel::before {
+  position: absolute;
+  inset: 0;
+  content: '';
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.24), transparent 34%),
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.24), transparent 30%);
+}
+
+.art-runtime-panel::after {
+  position: absolute;
+  inset: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  border-radius: 18px;
+  content: '';
+  pointer-events: none;
+  box-shadow: inset 0 0 24px rgba(255, 255, 255, 0.1);
+}
+
+.art-runtime-panel__header {
+  position: relative;
+  z-index: 1;
+}
+
 .fold-panel-enter-active,
 .fold-panel-leave-active {
   transition: all 220ms ease;

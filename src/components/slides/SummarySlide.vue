@@ -14,36 +14,43 @@ const { motion } = useSlideMotion(toRef(props, 'slide'));
 
 <template>
   <SlideShell :slide="slide">
-    <div class="grid h-full min-h-0 grid-rows-[auto_1fr] gap-6">
+    <div class="grid h-full min-h-0 grid-rows-[auto_1fr] gap-5">
       <div class="grid grid-cols-4 gap-4">
         <article
           v-for="(pillar, index) in slide.payload.pillars"
           :key="pillar.title"
-          class="slide-frost px-5 py-4"
+          class="slide-stage flex h-full flex-col justify-between px-5 py-4"
           v-bind="motion('card', index)"
         >
-          <p class="slide-label mb-2 text-blue-700/80">
-            要点 {{ index + 1 }}
-          </p>
-          <h3 class="mb-2 text-[22px] font-semibold text-slate-900">
-            {{ pillar.title }}
-          </h3>
-          <p class="text-[15px] leading-6 text-slate-600">
-            {{ pillar.detail }}
-          </p>
+          <div class="mb-3 flex items-start justify-between gap-3">
+            <p class="slide-label text-blue-700/80">
+              要点 {{ index + 1 }}
+            </p>
+            <span class="slide-number-chip !h-9 !w-9 !text-sm">
+              {{ index + 1 }}
+            </span>
+          </div>
+          <div class="space-y-2">
+            <h3 class="text-[21px] font-semibold leading-tight text-slate-900">
+              {{ pillar.title }}
+            </h3>
+            <p class="text-[14px] leading-6 text-slate-600">
+              {{ pillar.detail }}
+            </p>
+          </div>
         </article>
       </div>
 
-      <div class="grid min-h-0 grid-cols-[1.14fr_0.86fr] gap-6">
-        <div
-          class="grid min-h-0 gap-4"
-          :class="slide.media ? 'grid-cols-[0.9fr_0.7fr]' : 'grid-cols-1'"
-        >
+      <div class="grid min-h-0 grid-cols-[1.12fr_0.88fr] gap-5">
+        <div class="grid min-h-0 gap-4">
           <div
-            class="slide-stage flex h-full items-center px-8 py-8"
+            class="slide-stage flex h-full flex-col items-start justify-start gap-8 px-8 py-7"
             v-bind="motion('panel')"
           >
-            <p class="text-[30px] font-semibold leading-[1.55] text-slate-900">
+            <span class="slide-ribbon !px-3 !py-1 !text-[11px] !tracking-[0.18em]">
+              Final Takeaway
+            </span>
+            <p class="text-[28px] font-semibold leading-[1.6] text-slate-900">
               {{ slide.payload.closing }}
             </p>
           </div>
@@ -61,15 +68,20 @@ const { motion } = useSlideMotion(toRef(props, 'slide'));
             落地建议
           </div>
 
-          <div>
+          <div class="min-h-0">
             <ul class="space-y-4">
               <li
                 v-for="(item, index) in slide.payload.nextSteps"
                 :key="item"
-                class="slide-rail-card px-5 py-4 pl-10 text-base leading-7 text-slate-700"
+                class="slide-stage flex items-start gap-4 px-5 py-4 text-[15px] leading-7 text-slate-700"
                 v-bind="motion('rail', index)"
               >
-                {{ item }}
+                <span class="slide-number-chip !h-10 !w-10 !shrink-0 !text-sm">
+                  {{ index + 1 }}
+                </span>
+                <span class="pt-0.5">
+                  {{ item }}
+                </span>
               </li>
             </ul>
           </div>

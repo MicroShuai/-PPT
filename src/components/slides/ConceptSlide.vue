@@ -10,13 +10,91 @@ const props = defineProps<{
 }>();
 
 const layout = computed(() => props.slide.variant ?? (props.slide.payload.blocks.length > 3 ? 'matrix' : 'spotlight'));
+const isDefenseDepthSlide = computed(() => props.slide.id === 'defense-depth');
 const { motion } = useSlideMotion(toRef(props, 'slide'));
 </script>
 
 <template>
   <SlideShell :slide="slide">
     <div
-      v-if="layout === 'layers'"
+      v-if="isDefenseDepthSlide"
+      class="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] gap-4"
+    >
+      <div class="grid grid-cols-[1.08fr_0.92fr] gap-4">
+        <div
+          class="slide-stage px-6 py-5"
+          v-bind="motion('lead')"
+        >
+          <div class="mb-3 flex items-center justify-between gap-3">
+            <span class="slide-ribbon !px-3 !py-1 !text-[11px] !tracking-[0.18em]">
+              Defense Strategy
+            </span>
+            <span class="slide-label text-blue-700/80">
+              4 层同步生效
+            </span>
+          </div>
+          <p class="text-[17px] leading-7 text-slate-700">
+            {{ slide.payload.lead }}
+          </p>
+        </div>
+
+        <div
+          class="slide-quote-card px-6 py-5"
+          v-bind="motion('panel')"
+        >
+          <p class="slide-label mb-3 text-amber-700">
+            {{ slide.payload.emphasis.title }}
+          </p>
+          <p class="text-[16px] font-medium leading-7 text-amber-900">
+            {{ slide.payload.emphasis.body }}
+          </p>
+        </div>
+      </div>
+
+      <div class="grid min-h-0 grid-cols-2 gap-4">
+        <article
+          v-for="(block, index) in slide.payload.blocks"
+          :key="`${block.label}-${block.value}`"
+          class="slide-stage flex h-full flex-col justify-between gap-5 px-6 py-5"
+          v-bind="motion('card', index)"
+        >
+          <div class="flex items-start justify-between gap-4">
+            <div class="space-y-2.5">
+              <p class="slide-label text-blue-700/80">
+                {{ block.label }}
+              </p>
+              <p class="text-[26px] font-semibold leading-tight text-slate-900">
+                {{ block.value }}
+              </p>
+            </div>
+            <span class="slide-number-chip !h-10 !w-10 !text-base">
+              {{ index + 1 }}
+            </span>
+          </div>
+          <p class="text-[15px] leading-7 text-slate-600">
+            {{ block.description }}
+          </p>
+        </article>
+      </div>
+
+      <div
+        v-if="slide.payload.quote"
+        class="slide-quote-card px-6 py-4"
+        v-bind="motion('quote')"
+      >
+        <div class="flex items-center gap-4">
+          <span class="slide-ribbon !bg-amber-100/70 !text-amber-700">
+            防御原则
+          </span>
+          <p class="relative text-base leading-7 text-amber-900">
+            “{{ slide.payload.quote }}”
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div
+      v-else-if="layout === 'layers'"
       class="grid h-full min-h-0 grid-rows-[auto_1fr_auto] gap-5"
     >
       <div

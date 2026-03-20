@@ -110,6 +110,8 @@ export interface CaseStudyExamplePair {
 // 案例学习幻灯片的数据载体
 export interface CaseStudySlidePayload {
   icon?: string
+  staticChat?: boolean
+  disableThinking?: boolean
   scenarioLabel?: string
   challengeLabel?: string
   panelTitle?: string
@@ -120,8 +122,14 @@ export interface CaseStudySlidePayload {
   challenge: string[]
   beforePrompt: string
   beforeResponse?: string
+  beforeThinkingText?: string
   afterPrompt: string
   afterResponse?: string
+  afterThinkingText?: string
+  afterToolResultText?: string
+  afterToolResultLabel?: string
+  beforeToolResultText?: string
+  beforeToolResultLabel?: string
   examplePairs?: CaseStudyExamplePair[]
   outcomes: MetricItem[]
   learnings: string[]
@@ -139,6 +147,19 @@ export interface FlowSlidePayload {
   scenario?: string
   challengeLabel?: string
   challenge?: string[]
+  promptChain?: {
+    principles: Array<{
+      label: string
+      body: string
+    }>
+    steps: Array<{
+      label: string
+      title: string
+      focus: string
+      prompt: string
+    }>
+    diagramLabel?: string
+  }
   takeawayLabel?: string
   tips?: string[]
   runtimeSequence?: Array<{

@@ -261,15 +261,15 @@ body::after {
 
   .slide-chat-glass {
     @apply relative overflow-hidden rounded-[30px] border;
-    border-color: rgba(228, 237, 252, 0.92);
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(240, 246, 255, 0.08)),
-      radial-gradient(circle at 88% 14%, rgba(191, 216, 255, 0.4), transparent 27%),
-      radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.34), transparent 32%);
+    border-color: rgba(226, 236, 250, 0.62);
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.92),
-      0 22px 56px rgba(148, 163, 184, 0.1);
-    backdrop-filter: blur(28px) saturate(1.05);
+      inset 0 1px 0 rgba(255, 255, 255, 0.72),
+      0 18px 44px rgba(148, 163, 184, 0.08);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(241, 247, 255, 0.08)),
+      radial-gradient(circle at top right, rgba(152, 191, 255, 0.2), transparent 26%),
+      radial-gradient(circle at left center, rgba(255, 255, 255, 0.12), transparent 34%);
+    backdrop-filter: blur(24px) saturate(1.06);
   }
 
   .slide-chat-glass::before {
@@ -278,18 +278,18 @@ body::after {
     content: '';
     pointer-events: none;
     background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.24), transparent 32%),
-      radial-gradient(circle at 84% 18%, rgba(196, 220, 255, 0.24), transparent 22%);
+      linear-gradient(135deg, rgba(255, 255, 255, 0.24), transparent 34%),
+      radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.24), transparent 30%);
   }
 
   .slide-chat-glass::after {
     position: absolute;
-    inset: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.42);
-    border-radius: 28px;
+    inset: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.34);
+    border-radius: 24px;
     content: '';
     pointer-events: none;
-    box-shadow: inset 0 0 36px rgba(255, 255, 255, 0.12);
+    box-shadow: inset 0 0 24px rgba(255, 255, 255, 0.1);
   }
 
   .slide-stage:hover {
