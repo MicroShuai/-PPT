@@ -105,6 +105,8 @@ export interface CaseStudyExamplePair {
   beforeResponse?: string
   after: string
   afterResponse?: string
+  beforeIssues?: string[]
+  improvementPoints?: string[]
 }
 
 // 案例学习幻灯片的数据载体
@@ -115,9 +117,12 @@ export interface CaseStudySlidePayload {
   scenarioLabel?: string
   challengeLabel?: string
   panelTitle?: string
+  primaryExampleTitle?: string
   beforeLabel?: string
   afterLabel?: string
   learningsLabel?: string
+  beforeIssues?: string[]
+  improvementPoints?: string[]
   scenario: string
   challenge: string[]
   beforePrompt: string

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, toRef } from 'vue'
+import { ref, computed, toRef, watch, nextTick } from 'vue'
 import SlideShell from '@/components/common/SlideShell.vue'
 import CorrectionCard from '@/components/common/CorrectionCard.vue'
 import StreamingChat from '@/components/common/StreamingChat.vue'
@@ -176,9 +176,80 @@ const interactiveUsesToggle = computed(() => {
 const useStaticChatLayout = computed(() => Boolean(props.slide.payload.staticChat))
 const isRagSlide = computed(() => props.slide.id === 'rag')
 const chatStreamDelayMultiplier = computed(() =>
-  ['cot', 'cot-transaction'].includes(props.slide.id) ? 2.2 : 1
+  ['cot', 'cot-transaction'].includes(props.slide.id) ? 0.6 : 1
 )
-const shouldInlineAlerts = computed(() => props.slide.id === 'rag')
+const shouldInlineAlerts = computed(() => false)
+const promptOnlyCompareMode = computed(() => {
+  const payload = props.slide.payload
+
+  return layout.value === 'manifesto'
+    && Boolean(payload.beforePrompt?.trim() && payload.afterPrompt?.trim())
+    && !payload.beforeResponse?.trim()
+    && !payload.afterResponse?.trim()
+    && !isOutputLabel(payload.afterLabel)
+})
+const promptOnlyExampleIndex = ref(0)
+const promptAnalysisEl = ref<HTMLElement | null>(null)
+const promptOnlyExamples = computed(() => {
+  if (!promptOnlyCompareMode.value) return []
+
+  const payload = props.slide.payload
+  const primaryExample = {
+    title: payload.primaryExampleTitle?.trim() || payload.panelTitle?.trim() || '主案例',
+    before: payload.beforePrompt.trim(),
+    after: payload.afterPrompt.trim(),
+    beforeIssues: payload.beforeIssues ?? [],
+    improvementPoints: payload.improvementPoints ?? []
+  }
+
+  const extras = (payload.examplePairs ?? [])
+    .filter(pair => pair.before?.trim() && pair.after?.trim())
+    .map(pair => ({
+      title: pair.title?.trim() || '补充案例',
+      before: pair.before.trim(),
+      after: pair.after.trim(),
+      beforeIssues: pair.beforeIssues ?? [],
+      improvementPoints: pair.improvementPoints ?? []
+    }))
+
+  return [primaryExample, ...extras]
+})
+const selectedPromptOnlyExample = computed(() =>
+  promptOnlyExamples.value[promptOnlyExampleIndex.value]
+  ?? promptOnlyExamples.value[0]
+  ?? { title: '', before: '', after: '', beforeIssues: [], improvementPoints: [] }
+)
+const showPromptAnalysis = computed(() =>
+  isComparisonCorrected.value
+  && Boolean(
+    selectedPromptOnlyExample.value.beforeIssues.length
+    || selectedPromptOnlyExample.value.improvementPoints.length
+  )
+)
+
+watch(
+  () => `${props.slide.id}:${promptOnlyExamples.value.length}`,
+  () => {
+    promptOnlyExampleIndex.value = 0
+    isComparisonCorrected.value = false
+  },
+  { immediate: true }
+)
+
+const selectPromptOnlyExample = (index: number) => {
+  promptOnlyExampleIndex.value = index
+  isComparisonCorrected.value = false
+}
+
+watch(showPromptAnalysis, async visible => {
+  if (!visible) return
+
+  await nextTick()
+  promptAnalysisEl.value?.scrollIntoView({
+    behavior: 'smooth',
+    block: 'nearest'
+  })
+})
 
 // 获取当前 Manifesto 布局应显示的聊天内容
 const manifestoChatItem = computed(() => {
@@ -466,7 +537,105 @@ const workflowToneClasses = (tone: string) => {
 
       <!-- RIGHT COLUMN: Toggle compare only when there are truly two prompt states -->
       <div
-        v-if="manifestoUsesToggle"
+        v-if="promptOnlyCompareMode"
+        class="flex min-h-0 flex-col overflow-hidden rounded-[24px] border border-slate-200/60 bg-white/80 shadow-lg"
+        v-bind="motion('chat')"
+      >
+        <div class="flex items-center justify-between px-6 py-3.5 border-b border-slate-100 bg-slate-50/50 shrink-0">
+          <span class="text-[13px] font-bold text-slate-700">
+            {{ slide.payload.panelTitle ?? `${slide.title} Prompt Lab` }}
+          </span>
+
+          <span class="rounded-full bg-blue-50 px-3 py-1 text-[11px] font-bold tracking-[0.12em] text-blue-700">
+            {{ promptOnlyExamples.length }} CASES
+          </span>
+        </div>
+
+        <div class="shrink-0 border-b border-slate-100/90 px-6 py-4">
+          <div class="grid grid-cols-2 gap-3">
+            <button
+              v-for="(example, idx) in promptOnlyExamples"
+              :key="`${example.title}-${idx}`"
+              type="button"
+              class="prompt-compare-selector text-left"
+              :class="idx === promptOnlyExampleIndex ? 'prompt-compare-selector--active' : ''"
+              @click="selectPromptOnlyExample(idx)"
+            >
+              <div class="flex items-start justify-between gap-3">
+                <span class="prompt-compare-pill">
+                  {{ idx === 0 ? 'MAIN CASE' : `CASE 0${idx + 1}` }}
+                </span>
+                <span class="prompt-compare-state">
+                  {{ idx === promptOnlyExampleIndex ? '已选中' : '点击预览' }}
+                </span>
+              </div>
+
+              <h4 class="mt-3 text-[13px] font-bold leading-snug text-slate-900">
+                {{ example.title }}
+              </h4>
+              <p class="mt-2 text-[12px] leading-relaxed text-slate-500">
+                {{ shortenText(example.before, 68) }}
+              </p>
+            </button>
+          </div>
+        </div>
+
+        <div class="min-h-0 flex-1 overflow-auto px-6 py-5 custom-scrollbar-chat">
+          <CorrectionCard
+            v-model:is-corrected="isComparisonCorrected"
+            :title="selectedPromptOnlyExample.title"
+            :before="selectedPromptOnlyExample.before"
+            :after="selectedPromptOnlyExample.after"
+            :before-label="slide.payload.beforeLabel || 'Bad Prompt'"
+            :after-label="slide.payload.afterLabel || 'Good Prompt'"
+          />
+
+          <div
+            v-if="showPromptAnalysis"
+            ref="promptAnalysisEl"
+            class="mt-3 grid grid-cols-2 gap-3 pb-1"
+          >
+            <article class="prompt-analysis-card prompt-analysis-card--issue">
+              <div class="prompt-analysis-head">
+                <span class="prompt-analysis-kicker">WHY BAD</span>
+                <h4 class="prompt-analysis-title">原来不足</h4>
+              </div>
+
+              <ul class="mt-3 space-y-2.5">
+                <li
+                  v-for="item in selectedPromptOnlyExample.beforeIssues"
+                  :key="item"
+                  class="prompt-analysis-item"
+                >
+                  <span class="prompt-analysis-dot prompt-analysis-dot--issue" />
+                  <span>{{ item }}</span>
+                </li>
+              </ul>
+            </article>
+
+            <article class="prompt-analysis-card prompt-analysis-card--upgrade">
+              <div class="prompt-analysis-head">
+                <span class="prompt-analysis-kicker">WHAT CHANGED</span>
+                <h4 class="prompt-analysis-title">改进动作</h4>
+              </div>
+
+              <ul class="mt-3 space-y-2.5">
+                <li
+                  v-for="item in selectedPromptOnlyExample.improvementPoints"
+                  :key="item"
+                  class="prompt-analysis-item"
+                >
+                  <span class="prompt-analysis-dot prompt-analysis-dot--upgrade" />
+                  <span>{{ item }}</span>
+                </li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </div>
+
+      <div
+        v-else-if="manifestoUsesToggle"
         class="flex flex-col min-h-0 overflow-hidden rounded-[24px] border border-slate-200/60 bg-white/80 shadow-lg"
         v-bind="motion('chat')"
       >
@@ -1310,5 +1479,106 @@ const workflowToneClasses = (tone: string) => {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover,
 .custom-scrollbar-chat::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.4);
+}
+
+.prompt-compare-selector {
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(248, 250, 252, 0.95), rgba(255, 255, 255, 0.9));
+  padding: 14px 15px;
+  transition: all 0.28s ease;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.04);
+}
+
+.prompt-compare-selector:hover {
+  transform: translateY(-1px);
+  border-color: rgba(59, 130, 246, 0.25);
+  box-shadow: 0 14px 26px rgba(59, 130, 246, 0.08);
+}
+
+.prompt-compare-selector--active {
+  border-color: rgba(59, 130, 246, 0.34);
+  background: linear-gradient(145deg, rgba(239, 246, 255, 0.96), rgba(255, 255, 255, 0.95));
+  box-shadow: 0 16px 32px rgba(59, 130, 246, 0.12);
+}
+
+.prompt-compare-pill {
+  display: inline-flex;
+  border-radius: 9999px;
+  background: rgba(59, 130, 246, 0.1);
+  color: rgb(37, 99, 235);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  padding: 4px 9px;
+}
+
+.prompt-compare-state {
+  color: rgba(100, 116, 139, 0.95);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.prompt-analysis-card {
+  border-radius: 18px;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  padding: 14px 15px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+}
+
+.prompt-analysis-card--issue {
+  background: linear-gradient(145deg, rgba(255, 241, 242, 0.92), rgba(255, 255, 255, 0.94));
+  border-color: rgba(251, 113, 133, 0.18);
+}
+
+.prompt-analysis-card--upgrade {
+  background: linear-gradient(145deg, rgba(236, 253, 245, 0.92), rgba(255, 255, 255, 0.94));
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.prompt-analysis-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.prompt-analysis-kicker {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: rgba(100, 116, 139, 0.85);
+}
+
+.prompt-analysis-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: rgb(15, 23, 42);
+}
+
+.prompt-analysis-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: rgba(51, 65, 85, 0.95);
+}
+
+.prompt-analysis-dot {
+  margin-top: 7px;
+  height: 6px;
+  width: 6px;
+  flex-shrink: 0;
+  border-radius: 9999px;
+}
+
+.prompt-analysis-dot--issue {
+  background: rgb(244, 63, 94);
+}
+
+.prompt-analysis-dot--upgrade {
+  background: rgb(16, 185, 129);
 }
 </style>

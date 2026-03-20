@@ -256,7 +256,6 @@ const extractToolCallEnvelope = (value: string) => {
 const ALERT_META_MAP: Record<string, { label: string; tone: 'warning' | 'info' }> = {
   '问题': { label: '问题说明', tone: 'warning' },
   '问题说明': { label: '问题说明', tone: 'warning' },
-  '说明': { label: '说明', tone: 'warning' },
   '为什么会错': { label: '为什么会错', tone: 'warning' },
   '为什么错': { label: '为什么会错', tone: 'warning' },
   '错误原因': { label: '为什么会错', tone: 'warning' },
